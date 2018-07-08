@@ -47,7 +47,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       return field;
     }
 
-    const TableInputType = getGqlInputTypeByTypeIdAndModifier(table.type.id, null);
+    const TableInputType = getGqlInputTypeByTypeIdAndModifier(table.type.id, 'base');
 
     pgNestedResolvers[TableInputType.name] = field.resolve;
 
@@ -92,6 +92,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           resolveData,
           {},
         );
+        console.log('calling');
 
         try {
           await pgClient.query('SAVEPOINT graphql_nested_mutation');
@@ -327,7 +328,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           name: typeName,
           description: `Input for the nested mutation of \`${foreignTableName}\` in the \`${tableTypeName}\` mutation.`,
           fields: () => {
-            const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
+            const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, 'base');
             const operations = {
               connect: {
                 description: `The \`${foreignPKFieldType.name}\` of the PK for \`${foreignTableName}\` for the far side of the relationship.`,

@@ -69,20 +69,31 @@ type ContactInput {
     contactEmail: ContactEmailContactFkeyInverseInput
 }
 
+type ContactBaseInput {
+    id: Int
+    name: String
+}
+
 type ContactEmailInput {
     id: Int!
     contactId: ContactEmailContactFkeyInput!
     email: String!
 }
 
+type ContactEmailInput {
+    id: Int
+    contactId: Int
+    email: String
+}
+
 type ContactEmailContactFkeyInput {
     connect: Int
-    create: ContactInput
+    create: ContactBaseInput
 }
 
 type ContactEmailContactFkeyInverseInput {
     connect: [Int!]
-    create: [ContactEmailInput!]
+    create: [ContactEmailBaseInput!]
 }
 ```
 
