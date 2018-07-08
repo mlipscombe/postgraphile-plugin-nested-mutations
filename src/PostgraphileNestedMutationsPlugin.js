@@ -1,5 +1,4 @@
-import debugFactory from 'debug';
-
+const debugFactory = require('debug');
 const { omit } = require('graphile-build-pg');
 
 const debug = debugFactory('postgraphile-plugin-nested-mutations');
