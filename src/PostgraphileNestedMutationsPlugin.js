@@ -3,7 +3,7 @@ const { omit } = require('graphile-build-pg');
 
 const debug = debugFactory('postgraphile-plugin-nested-mutations');
 
-export default (function PostGraphileNestedMutationPlugin(builder) {
+module.exports = function PostGraphileNestedMutationPlugin(builder) {
   builder.hook('build', (build) => {
     const { inflection } = build;
     return build.extend(build, {
@@ -390,4 +390,4 @@ export default (function PostGraphileNestedMutationPlugin(builder) {
 
     return Object.assign({}, fields, nestedFields);
   });
-});
+};
