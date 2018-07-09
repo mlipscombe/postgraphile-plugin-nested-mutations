@@ -18,6 +18,12 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         const { constraint, foreignTable } = options;
         return inflection.upperCamelCase(`${constraint.name}_${foreignTable.name}_input`);
       },
+      pgNestedFieldName(field, options) {
+        const { isForward, foreignTable } = options;
+        return isForward
+          ? inflection.column(field)
+          : inflection.pluralize(inflection.tableFieldName(foreignTable));
+      },
     });
   });
 
@@ -272,6 +278,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       pgNestedPluginReverseInputTypes,
       pgNestedConnectorTypeName,
       pgNestedInputTypeName,
+      pgNestedFieldName,
       graphql: {
         GraphQLInputObjectType,
         GraphQLList,
@@ -353,7 +360,12 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       }
 
       const field = keys[0];
-      const fieldName = isForward ? inflection.column(field) : inflection.tableFieldName(foreignTable);
+      const fieldName = pgNestedFieldName(field, {
+        constraint,
+        table,
+        foreignTable,
+        isForward,
+      });
       const foreignField = isForward ? foreignKeys[0] : keys[0];
       const foreignPKFieldType = isForward
         ? getGqlInputTypeByTypeIdAndModifier(foreignField.typeId, null)
@@ -375,7 +387,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
             const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
             const inputFields = gqlForeignTableType._fields;
             const omittedField = inflection.column(field);
-
+            // return _.omit(gqlForeignTableType._fields, inflection.column(field));
             return Object.keys(inputFields)
               .filter(key => key !== omittedField)
               .map(k => Object.assign({}, { [k]: inputFields[k] }))

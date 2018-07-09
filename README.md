@@ -65,7 +65,7 @@ This schema will result in a GraphQL input type that looks like this:
 type ContactInput {
     id: Int!
     name: String!
-    contactEmail: ContactEmailContactFkeyInverseInput
+    contactEmails: ContactEmailContactFkeyInverseInput
 }
 
 type ContactBaseInput {
@@ -104,7 +104,7 @@ mutation {
     createContact(input: {
         contact: {
             name: "John Smith"
-            contactEmail: {
+            contactEmails: {
                 create: [{
                     email: "john@example.com"
                 }, {
