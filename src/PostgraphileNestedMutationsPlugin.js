@@ -10,9 +10,13 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       pgNestedPluginForwardInputTypes: {},
       pgNestedPluginReverseInputTypes: {},
       pgNestedResolvers: {},
-      pgNestedTypeName(options) {
+      pgNestedConnectorTypeName(options) {
         const { constraint, isForward } = options;
         return inflection.upperCamelCase(`${constraint.name}_${isForward ? '' : 'Inverse'}_input`);
+      },
+      pgNestedInputTypeName(options) {
+        const { constraint, foreignTable } = options;
+        return inflection.upperCamelCase(`${constraint.name}_${foreignTable.name}_input`);
       },
     });
   });
@@ -47,11 +51,10 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       return field;
     }
 
-    const TableInputType = getGqlInputTypeByTypeIdAndModifier(table.type.id, 'base');
-
-    pgNestedResolvers[TableInputType.name] = field.resolve;
+    const TableInputType = getGqlInputTypeByTypeIdAndModifier(table.type.id, null);
 
     if (!pgNestedPluginForwardInputTypes[TableInputType.name] && !pgNestedPluginReverseInputTypes[TableInputType.name]) {
+      pgNestedResolvers[TableInputType.name] = field.resolve;
       return field;
     }
 
@@ -77,149 +80,186 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       .filter(attr => attr.classId === table.id)
       .filter(attr => primaryKeyConstraint.keyAttributeNums.includes(attr.num));
 
-    return {
-      ...field,
-      resolve: async (data, { input }, { pgClient }, resolveInfo) => {
-        const PayloadType = getTypeByName(inflection.createPayloadType(table));
-        const inputData = input[inflection.tableFieldName(table)];
-        const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
-        const resolveData = getDataFromParsedResolveInfoFragment(parsedResolveInfoFragment, PayloadType);
-        const insertedRowAlias = sql.identifier(Symbol());
-        const query = queryFromResolveData(
-          insertedRowAlias,
-          insertedRowAlias,
-          resolveData,
+    const recurseForwardNestedMutations = async (inputType, data, { input }, { pgClient }, resolveInfo) => {
+      const nestedFields = pgNestedPluginForwardInputTypes[inputType.name];
+      const output = Object.assign({}, input);
+      await Promise.all(nestedFields
+        .filter(k => Object.prototype.hasOwnProperty.call(input, k.name))
+        .map(async (f) => {
+          const fieldName = f.name;
+          const fieldValue = input[fieldName];
+          let outputValue = fieldValue;
+
+          if (fieldValue.connect) {
+            outputValue = fieldValue.connect;
+          } else if (fieldValue.create) {
+            const createData = fieldValue.create;
+            const { foreignTable, foreignField } = f;
+            const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
+            const resolver = pgNestedResolvers[gqlForeignTableType.name];
+            const tableVar = inflection.tableFieldName(foreignTable);
+
+            const insertData = Object.assign(
+              {},
+              createData,
+              await recurseForwardNestedMutations(
+                gqlForeignTableType,
+                data,
+                { input: { [tableVar]: createData } },
+                { pgClient },
+                resolveInfo,
+              ),
+            );
+
+            const resolveResult = await resolver(
+              data,
+              { input: { [tableVar]: insertData } },
+              { pgClient },
+              resolveInfo,
+            );
+            outputValue = resolveResult.data[`__pk__${foreignField.name}`];
+          }
+          output[fieldName] = outputValue;
+        }));
+
+      return output;
+    };
+
+    const newResolver = async (data, { input }, { pgClient }, resolveInfo) => {
+      const PayloadType = getTypeByName(inflection.createPayloadType(table));
+      const tableFieldName = inflection.tableFieldName(table);
+      const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
+      const resolveData = getDataFromParsedResolveInfoFragment(parsedResolveInfoFragment, PayloadType);
+      const insertedRowAlias = sql.identifier(Symbol());
+      const query = queryFromResolveData(
+        insertedRowAlias,
+        insertedRowAlias,
+        resolveData,
+        {},
+      );
+
+      try {
+        await pgClient.query('SAVEPOINT graphql_nested_mutation');
+
+        // run forward nested mutations
+        const inputData = Object.assign(
           {},
+          input[tableFieldName],
+          await recurseForwardNestedMutations(
+            TableInputType,
+            data,
+            { input: input[tableFieldName] },
+            { pgClient },
+            resolveInfo,
+          ),
         );
 
-        try {
-          await pgClient.query('SAVEPOINT graphql_nested_mutation');
-
-          // run forward nested mutations
-          await Promise.all(Object.keys(inputData).map(async (key) => {
-            const nestedField = pgNestedPluginForwardInputTypes[TableInputType.name]
-              .find(obj => obj.name === key);
-            if (!nestedField) {
-              return;
+        const sqlColumns = [];
+        const sqlValues = [];
+        introspectionResultsByKind.attribute
+          .filter(attr => attr.classId === table.id)
+          .filter(attr => pgColumnFilter(attr, build, context))
+          .filter(attr => !omit(attr, 'create'))
+          .forEach((attr) => {
+            const fieldName = inflection.column(attr);
+            const val = inputData[fieldName];
+            if (
+              Object.prototype.hasOwnProperty.call(
+                inputData,
+                fieldName,
+              )
+            ) {
+              sqlColumns.push(sql.identifier(attr.name));
+              sqlValues.push(gql2pg(val, attr.type, null));
             }
+          });
 
-            if (inputData[key].connect) {
-              inputData[key] = inputData[key].connect;
-            } else if (inputData[key].create) {
-              const insertData = inputData[key].create;
-              const { foreignTable, foreignField } = nestedField;
+        /* eslint indent: 0 */
+        const mutationQuery = sql.query`
+          insert into ${sql.identifier(table.namespace.name, table.name)}
+            ${sqlColumns.length
+              ? sql.fragment`(
+                  ${sql.join(sqlColumns, ', ')}
+                ) values(${sql.join(sqlValues, ', ')})`
+              : sql.fragment`default values`
+            } returning *`;
+        const { text, values } = sql.compile(mutationQuery);
+        const { rows: insertedRows } = await pgClient.query(text, values);
+        const insertedRow = insertedRows[0];
+
+        await Promise.all(Object.keys(inputData).map(async (key) => {
+          const nestedField = pgNestedPluginReverseInputTypes[TableInputType.name]
+            .find(obj => obj.name === key);
+          if (!nestedField) {
+            return;
+          }
+
+          if (inputData[key].connect) {
+            // update foreign record to have this mutation's ID
+            throw new Error('`connect` is currently not supported for reverse nested mutations.');
+          } else if (inputData[key].create) {
+            await Promise.all(inputData[key].create.map(async (rowData) => {
+              const {
+                foreignTable,
+                keys, // nested table's keys
+                foreignKeys, // main mutation table's keys
+              } = nestedField;
               const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
               const resolver = pgNestedResolvers[gqlForeignTableType.name];
               const tableVar = inflection.tableFieldName(foreignTable);
-              const resolveResult = await resolver(
+
+              const keyData = {};
+              keys.forEach((k, idx) => {
+                const columnName = inflection.column(k);
+                keyData[columnName] = insertedRow[foreignKeys[idx].name];
+              });
+
+              await resolver(
                 data,
-                { input: { [tableVar]: insertData } },
+                { input: { [tableVar]: Object.assign({}, rowData, keyData) } },
                 { pgClient },
                 resolveInfo,
               );
-              inputData[key] = resolveResult.data[`__pk__${foreignField.name}`];
-            }
-          }));
+            }));
+          }
+        }));
 
-          const sqlColumns = [];
-          const sqlValues = [];
-          introspectionResultsByKind.attribute
-            .filter(attr => attr.classId === table.id)
-            .filter(attr => pgColumnFilter(attr, build, context))
-            .filter(attr => !omit(attr, 'create'))
-            .forEach((attr) => {
-              const fieldName = inflection.column(attr);
-              const val = inputData[fieldName];
-              if (
-                Object.prototype.hasOwnProperty.call(
-                  inputData,
-                  fieldName,
-                )
-              ) {
-                sqlColumns.push(sql.identifier(attr.name));
-                sqlValues.push(gql2pg(val, attr.type, null));
-              }
-            });
+        const where = [];
+        primaryKeyFields.forEach((f) => {
+          where.push(sql.fragment`
+            ${sql.identifier(f.name)} = ${sql.value(insertedRow[f.name])}
+          `);
+        });
 
-          /* eslint indent: 0 */
-          const mutationQuery = sql.query`
-            insert into ${sql.identifier(table.namespace.name, table.name)}
-              ${sqlColumns.length
-                ? sql.fragment`(
-                    ${sql.join(sqlColumns, ', ')}
-                  ) values(${sql.join(sqlValues, ', ')})`
-                : sql.fragment`default values`
-              } returning *`;
-          const { text, values } = sql.compile(mutationQuery);
-          const { rows: insertedRows } = await pgClient.query(text, values);
-          const insertedRow = insertedRows[0];
+        const finalRows = await viaTemporaryTable(
+          pgClient,
+          sql.identifier(table.namespace.name, table.name),
+          sql.query`
+            select * from ${sql.identifier(table.namespace.name, table.name)}
+            where ${sql.join(where, ' AND ')}
+          `,
+          insertedRowAlias,
+          query,
+        );
 
-          await Promise.all(Object.keys(inputData).map(async (key) => {
-            const nestedField = pgNestedPluginReverseInputTypes[TableInputType.name]
-              .find(obj => obj.name === key);
-            if (!nestedField) {
-              return;
-            }
-
-            if (inputData[key].connect) {
-              // update foreign record to have this mutation's ID
-              throw new Error('`connect` is currently not supported for reverse nested mutations.');
-            } else if (inputData[key].create) {
-              await Promise.all(inputData[key].create.map(async (rowData) => {
-                const {
-                  foreignTable,
-                  keys, // nested table's keys
-                  foreignKeys, // main mutation table's keys
-                } = nestedField;
-                const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
-                const resolver = pgNestedResolvers[gqlForeignTableType.name];
-                const tableVar = inflection.tableFieldName(foreignTable);
-
-                const keyData = {};
-                keys.forEach((k, idx) => {
-                  const columnName = inflection.column(k);
-                  keyData[columnName] = insertedRow[foreignKeys[idx].name];
-                });
-
-                await resolver(
-                  data,
-                  { input: { [tableVar]: Object.assign({}, rowData, keyData) } },
-                  { pgClient },
-                  resolveInfo,
-                );
-              }));
-            }
-          }));
-
-          const where = [];
-          primaryKeyFields.forEach((f) => {
-            where.push(sql.fragment`
-              ${sql.identifier(f.name)} = ${sql.value(insertedRow[f.name])}
-            `);
-          });
-
-          const finalRows = await viaTemporaryTable(
-            pgClient,
-            sql.identifier(table.namespace.name, table.name),
-            sql.query`
-              select * from ${sql.identifier(table.namespace.name, table.name)}
-              where ${sql.join(where, ' AND ')}
-            `,
-            insertedRowAlias,
-            query,
-          );
-
-          await pgClient.query('RELEASE SAVEPOINT graphql_nested_mutation');
-          return {
-            clientMutationId: input.clientMutationId,
-            data: finalRows[0],
-          };
-        } catch (e) {
-          await pgClient.query('ROLLBACK TO SAVEPOINT graphql_nested_mutation');
-          throw e;
-        }
-      },
+        await pgClient.query('RELEASE SAVEPOINT graphql_nested_mutation');
+        return {
+          clientMutationId: input.clientMutationId,
+          data: finalRows[0],
+        };
+      } catch (e) {
+        await pgClient.query('ROLLBACK TO SAVEPOINT graphql_nested_mutation');
+        throw e;
+      }
     };
+
+    pgNestedResolvers[TableInputType.name] = newResolver;
+
+    return Object.assign(
+      {},
+      field,
+      { resolve: newResolver },
+    );
   });
 
   builder.hook('GraphQLInputObjectType:fields', (fields, build, context) => {
@@ -230,7 +270,8 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgNestedPluginForwardInputTypes,
       pgNestedPluginReverseInputTypes,
-      pgNestedTypeName,
+      pgNestedConnectorTypeName,
+      pgNestedInputTypeName,
       graphql: {
         GraphQLInputObjectType,
         GraphQLList,
@@ -318,32 +359,27 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         ? getGqlInputTypeByTypeIdAndModifier(foreignField.typeId, null)
         : getGqlInputTypeByTypeIdAndModifier(field.typeId, null);
 
-      const typeName = pgNestedTypeName({ constraint, isForward });
+      const inputTypeName = pgNestedInputTypeName({
+        constraint,
+        table,
+        foreignTable,
+        isForward,
+      });
 
-      const nestedInputField = newWithHooks(
+      const inputType = newWithHooks(
         GraphQLInputObjectType,
         {
-          name: typeName,
-          description: `Input for the nested mutation of \`${foreignTableName}\` in the \`${tableTypeName}\` mutation.`,
+          name: inputTypeName,
+          description: `The \`${foreignTableName}\` to be created by this mutation.`,
           fields: () => {
-            const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, 'base');
-            const operations = {
-              connect: {
-                description: `The \`${foreignPKFieldType.name}\` of the PK for \`${foreignTableName}\` for the far side of the relationship.`,
-                type: isForward ? foreignPKFieldType : new GraphQLList(new GraphQLNonNull(foreignPKFieldType)),
-              },
-            };
-            if (!omit(foreignTable, 'create')) {
-              if (gqlForeignTableType) {
-                operations.create = {
-                  description: `A \`${gqlForeignTableType.name}\` object that will be created and connected to this object.`,
-                  type: isForward ? gqlForeignTableType : new GraphQLList(new GraphQLNonNull(gqlForeignTableType)),
-                };
-              } else {
-                debug(`Could not determine type for foreign table with id ${isForward ? constraint.foreignClassId : constraint.classId}`);
-              }
-            }
-            return operations;
+            const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
+            const inputFields = gqlForeignTableType._fields;
+            const omittedField = inflection.column(field);
+
+            return Object.keys(inputFields)
+              .filter(key => key !== omittedField)
+              .map(k => Object.assign({}, { [k]: inputFields[k] }))
+              .reduce((res, o) => Object.assign(res, o), {});
           },
         },
         {
@@ -355,16 +391,59 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         },
       );
 
+      const connectorTypeName = pgNestedConnectorTypeName({
+        constraint,
+        table,
+        foreignTable,
+        isForward,
+      });
+
+      const connectorInputField = newWithHooks(
+        GraphQLInputObjectType,
+        {
+          name: connectorTypeName,
+          description: `Input for the nested mutation of \`${foreignTableName}\` in the \`${tableTypeName}\` mutation.`,
+          fields: () => {
+            const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
+            const operations = {
+              connect: {
+                description: `The \`${foreignPKFieldType.name}\` of the PK for \`${foreignTableName}\` for the far side of the relationship.`,
+                type: isForward ? foreignPKFieldType : new GraphQLList(new GraphQLNonNull(foreignPKFieldType)),
+              },
+            };
+            if (!omit(foreignTable, 'create')) {
+              if (gqlForeignTableType) {
+                operations.create = {
+                  description: `A \`${gqlForeignTableType.name}\` object that will be created and connected to this object.`,
+                  type: isForward ? inputType : new GraphQLList(new GraphQLNonNull(inputType)),
+                };
+              } else {
+                debug(`Could not determine type for foreign table with id ${isForward ? constraint.foreignClassId : constraint.classId}`);
+              }
+            }
+            return operations;
+          },
+        },
+        {
+          isNestedMutationConnectorType: true,
+          isNestedInverseMutation: !isForward,
+          pgInflection: table,
+          pgFieldInflection: field,
+          pgNestedForeignInflection: foreignTable,
+        },
+      );
+
       nestedFields[fieldName] = {
         ...fields[fieldName],
         type: isForward
-          ? (field.isNotNull ? new GraphQLNonNull(nestedInputField) : nestedInputField)
-          : nestedInputField,
+          ? (field.isNotNull ? new GraphQLNonNull(connectorInputField) : connectorInputField)
+          : connectorInputField,
       };
 
       if (isForward) {
         pgNestedPluginForwardInputTypes[gqlType.name].push({
           name: fieldName,
+          inputType,
           constraint,
           table,
           field,
@@ -376,6 +455,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       } else {
         pgNestedPluginReverseInputTypes[gqlType.name].push({
           name: fieldName,
+          inputType,
           constraint,
           table,
           field,

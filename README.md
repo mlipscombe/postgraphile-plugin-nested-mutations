@@ -2,12 +2,11 @@
 
 # postgraphile-plugin-nested-mutations
 This plugin implements nested mutations based on both forward and reverse foreign
-key relationships in PostGraphile v4.
+key relationships in PostGraphile v4.  Nested mutations can be of infinite depth.
 
 ## Warning
-This is *alpha quality* software.  It has not undergone significant testing, and it
-currently supports a single level of nesting, and does not support "connecting" reverse
-relationships yet.
+This is *alpha quality* software.  It has not undergone significant testing and 
+does not support "connecting" reverse relationships yet.
 
 ## Getting Started
 
