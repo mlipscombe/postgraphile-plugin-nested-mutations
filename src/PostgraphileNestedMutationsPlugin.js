@@ -68,7 +68,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
     if (reverseMutations.length) {
       addArgDataGenerator(() => ({
         pgQuery: (queryBuilder) => {
-          const keys = reverseMutations.flatMap(({ foreignKeys }) => foreignKeys);
+          const keys = reverseMutations.reduce((acc, { foreignKeys }) => acc.concat(foreignKeys), []);
           keys.forEach((key) => {
             queryBuilder.select(
               sql.fragment`${queryBuilder.getTableAlias()}.${sql.identifier(key.name)}`,
@@ -445,12 +445,15 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         },
       );
 
-      nestedFields[fieldName] = {
-        ...fields[fieldName],
-        type: isForward
-          ? (field.isNotNull ? new GraphQLNonNull(connectorInputField) : connectorInputField)
-          : connectorInputField,
-      };
+      nestedFields[fieldName] = Object.assign(
+        {},
+        fields[fieldName],
+        {
+          type: isForward
+            ? (field.isNotNull ? new GraphQLNonNull(connectorInputField) : connectorInputField)
+            : connectorInputField,
+        },
+      );
 
       if (isForward) {
         pgNestedPluginForwardInputTypes[gqlType.name].push({
