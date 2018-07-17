@@ -57,4 +57,4 @@ jobs:
           name: Run unit tests
           environment:
             TEST_DATABASE_URL: postgres://circleci@localhost:5432/circle_test
-          command: yarn test
+          command: yarn test -- --ci --testResultsProcessor="./node_modules/jest-junit-reporter"
