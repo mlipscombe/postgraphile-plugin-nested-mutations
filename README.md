@@ -4,9 +4,20 @@
 This plugin implements nested mutations based on both forward and reverse foreign
 key relationships in PostGraphile v4.  Nested mutations can be of infinite depth.
 
+## Breaking Changes
+
+### v1.0.0-alpha.7
+
+Relationships using composite keys are now supported, and this has meant creating
+a custom field name for the nested mutation, rather than piggybacking an existing ID
+field.  See the examples below for the new GraphQL schema that is generated.
+
 ## Warning
 This is *alpha quality* software.  It has not undergone significant testing and 
-does not support "connecting" reverse relationships yet.
+the following features are not yet implemented:
+
+ * `connect` on reverse relationships (i.e. updating an existing row to connect to a new one);
+ * nested mutations on any mutations other than `create` mutations.
 
 ## Getting Started
 
@@ -45,110 +56,130 @@ This plugin creates an additional field on each GraphQL `Input` type for every f
 and reverse foreign key relationship on a table, with the same name as the foreign table.
 
 ``` sql
-CREATE TABLE contact (
-    id serial primary key,
-    name text not null
+create table parent (
+  id serial primary key,
+  name text not null
 );
 
-CREATE TABLE contact_email (
-    id serial primary key,
-    contact_id integer not null,
-    email text not null,
-    constraint contact_email_contact_fkey foreign key (contact_id)
-        references contact (id)
+create table child (
+  id serial primary key,
+  parent_id integer,
+  name text not null,
+  constraint child_parent_fkey foreign key (parent_id)
+    references p.parent (id)
 );
 ```
 
 This schema will result in a GraphQL input type that looks like this:
 
 ``` graphql
-type ContactInput {
-    id: Int!
-    name: String!
-    contactEmails: ContactEmailContactFkeyInverseInput
+input ParentInput {
+  id: Int
+  name: String!
+  childrenUsingId: ChildParentFkeyInverseInput
 }
 
-type ContactBaseInput {
-    id: Int
-    name: String
+input ChildInput {
+  id: Int
+  name: String!
+  parentId: Int
+  parentToParentId: ChildParentFkeyInput
 }
 
-type ContactEmailInput {
-    id: Int!
-    contactId: ContactEmailContactFkeyInput!
-    email: String!
+input ChildParentFkeyInput {
+  connect: ChildParentFkeyParentConnectInput
+  create: ChildParentFkeyParentCreateInput
 }
 
-type ContactEmailInput {
-    id: Int
-    contactId: Int
-    email: String
+input ChildParentFkeyParentConnectInput {
+  id: Int
 }
 
-type ContactEmailContactFkeyInput {
-    connect: Int
-    create: ContactBaseInput
+input ChildParentFkeyParentCreateInput {
+  id: Int
+  name: String!
+  childrenUsingId: ChildParentFkeyInverseInput
 }
 
-type ContactEmailContactFkeyInverseInput {
-    connect: [Int!]
-    create: [ContactEmailBaseInput!]
+input ChildParentFkeyInverseInput {
+  connect: [ChildParentFkeyChildConnectInput!]
+  create: [ChildParentFkeyChildCreateInput!]
+}
+
+input ChildParentFkeyChildConnectInput {
+  id: Int
+}
+
+input ChildParentFkeyChildCreateInput {
+  id: Int
+  name: String!
+  parentToParentId: ChildParentFkeyInput
 }
 ```
 
-A nested mutation against this schema, using `Contact` as the base mutation
+A nested mutation against this schema, using `Parent` as the base mutation
 would look like this:
 
 ``` graphql
 mutation {
-    createContact(input: {
-        contact: {
-            name: "John Smith"
-            contactEmails: {
-                create: [{
-                    email: "john@example.com"
-                }, {
-                    email: "john2@example.com"
-                }]
-            }
-        }
-    }) {
-        contact {
-            id
-            name
-            contactEmailsByContactId {
-                nodes {
-                    id
-                    email
-                }
-            }
-        }
+  createParent(input: {
+    parent: {
+      name: "Parent 1"
+      childrenUsingId: {
+        create: [{
+          name: "Child 1"
+        }, {
+          name: "Child 2"
+        }]
+      }
     }
+  }) {
+    parent {
+      id
+      name
+      childrenByParentId {
+        nodes {
+          id
+          name
+        }
+      }
+    }
+  }
 }
 ```
 
-Or using `ContactEmail` as the base mutation:
+Or using `Child` as the base mutation:
 
 ``` graphql
 mutation {
-    createContactEmail(input: {
-        contactEmail: {
-            contactId: {
-                create: {
-                    name: "John Smith"
-                }
-            }
-        },
-        email: "john@example.com"
-    }) {
-        contactEmail {
-            id
-            email
-            contactByContactId {
-                id
-                name
-            }
+  createChild(input: {
+    child: {
+      name: "Child 1"
+      parentToParentId: {
+        create: {
+          name: "Parent of Child 1"
         }
+      }
+    },
+  }) {
+    child {
+      id
+      name
+      parentByParentId {
+        id
+        name
+      }
     }
+  }
 }
+```
+
+## Smart Comments
+
+[Smart comments|https://www.graphile.org/postgraphile/smart-comments/] are supported for 
+renaming the nested mutation fields.
+
+```sql
+comment on constraint child_parent_fkey on child is
+  E'@forwardMutationName parent\n@reverseMutationName children';
 ```
