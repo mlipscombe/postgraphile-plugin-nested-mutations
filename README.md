@@ -177,7 +177,7 @@ mutation {
 
 ## Smart Comments
 
-[Smart comments|https://www.graphile.org/postgraphile/smart-comments/] are supported for 
+[Smart comments](https://www.graphile.org/postgraphile/smart-comments/) are supported for 
 renaming the nested mutation fields.
 
 ```sql
