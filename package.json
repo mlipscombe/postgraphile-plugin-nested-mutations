@@ -13,7 +13,8 @@
     "url": "https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues"
   },
   "scripts": {
-    "test": "scripts/test"
+    "test": "scripts/test",
+    "lint": "eslint index.js src/**/*.js"
   },
   "dependencies": {
     "graphile-build-pg": "^4.0.0-rc.4"
@@ -27,7 +28,7 @@
     "eslint-plugin-import": "^2.12.0",
     "graphql": ">=0.9 <0.14",
     "jest": "^20.0.4",
-    "jest-junit-reporter": "^1.1.0",
+    "jest-junit": "^5.1.0",
     "pg": ">=6.1.0 <8",
     "postgraphile-core": "^4.0.0-rc.4"
   },

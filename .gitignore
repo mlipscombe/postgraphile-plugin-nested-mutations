@@ -7,6 +7,7 @@ coverage
 build
 .netlify
 dist
+reports/
 
 # misc
 .DS_Store
