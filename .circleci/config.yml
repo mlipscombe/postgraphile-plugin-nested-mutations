@@ -30,15 +30,19 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: yarn install
+      - run:
+          name: Installing dependencies
+          command: |
+            yarn install
+            sudo apt-get install postgresql-client
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      
+               
       - run:
-          name: Waiting for Postgrs to be ready
+          name: Waiting for Postgres to be ready
           command: |
             for i in `seq 1 10`;
             do
