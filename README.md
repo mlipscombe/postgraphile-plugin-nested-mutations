@@ -1,4 +1,4 @@
-[![Package on npm](https://img.shields.io/npm/v/postgraphile-plugin-nested-mutations.svg)](https://www.npmjs.com/package/postgraphile-plugin-nested-mutations)
+[![Package on npm](https://img.shields.io/npm/v/postgraphile-plugin-nested-mutations.svg) (https://www.npmjs.com/package/postgraphile-plugin-nested-mutations) [![CircleCI](https://circleci.com/gh/mlipscombe/postgraphile-plugin-nested-mutations/tree/master.svg?style=svg)](https://circleci.com/gh/mlipscombe/postgraphile-plugin-nested-mutations/tree/master)
 
 # postgraphile-plugin-nested-mutations
 This plugin implements nested mutations based on both forward and reverse foreign
