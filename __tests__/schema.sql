@@ -59,3 +59,17 @@ create table p.multi_child (
   constraint multi_child_multi_parent_fkey foreign key (parent_id, parent_name)
     references p.multi_parent (id, name)
 );
+
+create table p.issue_1_parent (
+  id uuid default uuid_generate_v4(),
+  primary key (id)
+);
+
+create table p.issue_1_child (
+  parent_id uuid not null,
+  service_id varchar(50) not null,
+  name varchar(50) not null,
+  val varchar(50) not null,
+  primary key (parent_id, service_id, name, val),
+  foreign key (parent_id) references p.issue_1_parent (id)
+);

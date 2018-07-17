@@ -30,12 +30,45 @@ mutation {
   ) {
     ...multiChildInfo
   }
+
+  multi3: createIssue1Parent(
+    input: {
+      issue1Parent: {
+        id: "3ae98218-c9f4-444f-bca0-115cc534198a"
+        issue1ChildrenUsingId: {
+          create: [{
+            name: "issue1 parent"
+            serviceId: "test"
+            val: "test"
+          }]
+        }
+      }
+    }
+  ) {
+    ...issue1ParentInfo
+  }
+
+  multi4: createIssue1Child(
+    input: {
+      issue1Child: {
+        name: "issue1 parent"
+        serviceId: "test"
+        val: "test"
+        issue1ParentToParentId: {
+          create: {
+            id: "8b8ff23c-b632-46c6-8169-1cd95d1bd44b"
+          }
+        }
+      }
+    }
+  ) {
+    ...issue1ChildInfo
+  }
 }
 
 fragment multiParentInfo on CreateMultiParentPayload {
   multiParent {
     id
-    name
     multiChildrenByParentIdAndParentName {
       nodes {
         id
@@ -52,7 +85,32 @@ fragment multiChildInfo on CreateMultiChildPayload {
     name
     multiParentByParentIdAndParentName {
       id
-      name
+    }
+  }
+}
+
+fragment issue1ParentInfo on CreateIssue1ParentPayload {
+  issue1Parent {
+    id
+    issue1ChildrenByParentId {
+      nodes {
+        parentId
+        serviceId
+        name
+        val
+      }
+    }
+  }
+}
+
+fragment issue1ChildInfo on CreateIssue1ChildPayload {
+  issue1Child {
+    parentId
+    serviceId
+    name
+    val
+    issue1ParentByParentId {
+      id
     }
   }
 }

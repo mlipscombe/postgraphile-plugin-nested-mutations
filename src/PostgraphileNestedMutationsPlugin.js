@@ -442,6 +442,13 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         isForward,
       });
 
+      const primaryKeyConstraint = introspectionResultsByKind.constraint
+        .filter(con => con.type === 'p')
+        .find(con => con.classId === foreignTable.id);
+      const primaryKeyFields = introspectionResultsByKind.attribute
+        .filter(attr => attr.classId === foreignTable.id)
+        .filter(attr => primaryKeyConstraint.keyAttributeNums.includes(attr.num));
+
       const connectInputType = newWithHooks(
         GraphQLInputObjectType,
         {
@@ -450,8 +457,9 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           fields: () => {
             const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
             const inputFields = gqlForeignTableType._fields;
+
             return Object.keys(inputFields)
-              .filter(key => foreignKeys.map(fk => fk.name).includes(key))
+              .filter(key => primaryKeyFields.map(pkf => pkf.name).includes(key))
               .map(k => Object.assign({}, { [k]: inputFields[k] }))
               .reduce((res, o) => Object.assign(res, o), {});
           },
