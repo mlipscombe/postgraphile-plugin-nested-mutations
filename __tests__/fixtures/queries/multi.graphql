@@ -1,0 +1,58 @@
+mutation {
+  multi1: createMultiParent(
+    input: {
+      multiParent: {
+        name: "test multi1"
+        multiChildrenUsingIdAndName: {
+          create: [{
+            name: "child 1 of test multi1"
+          }, {
+            name: "child 2 of test multi1"
+          }]
+        }
+      }
+    }
+  ) {
+    ...multiParentInfo
+  }
+
+  multi2: createMultiChild(
+    input: {
+      multiChild: {
+        name: "test multi2"
+        multiParentToParentIdAndParentName: {
+          create: {
+            name: "parent of child multi2"
+          }
+        }
+      }
+    }
+  ) {
+    ...multiChildInfo
+  }
+}
+
+fragment multiParentInfo on CreateMultiParentPayload {
+  multiParent {
+    id
+    name
+    multiChildrenByParentIdAndParentName {
+      nodes {
+        id
+        parentId
+        parentName
+      }
+    }
+  }
+}
+
+fragment multiChildInfo on CreateMultiChildPayload {
+  multiChild {
+    id
+    name
+    multiParentByParentIdAndParentName {
+      id
+      name
+    }
+  }
+}

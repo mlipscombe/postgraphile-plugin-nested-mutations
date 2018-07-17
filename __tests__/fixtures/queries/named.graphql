@@ -1,0 +1,59 @@
+mutation {
+  # Create multiple children.
+  named1: createNamedParent(
+    input: {
+      namedParent: {
+        name: "test named1"
+        children: {
+          create: [{
+            name: "child 1 of test named1"
+          }, {
+            name: "child 2 of test named1"
+          }]
+        }
+      }
+    }
+  ) {
+    ...namedParentInfo
+  }
+
+  named2: createNamedChild(
+    input: {
+      namedChild: {
+        name: "test named2"
+        parent: {
+          create: {
+            name: "parent of child named2"
+          }
+        }
+      }
+    }
+  ) {
+    ...namedChildInfo
+  }
+}
+
+fragment namedParentInfo on CreateNamedParentPayload {
+  namedParent {
+    id
+    name
+    namedChildrenByParentId {
+      nodes {
+        id
+        parentId
+        name
+      }
+    }
+  }
+}
+
+fragment namedChildInfo on CreateNamedChildPayload {
+  namedChild {
+    id
+    name
+    namedParentByParentId {
+      id
+      name
+    }
+  }
+}

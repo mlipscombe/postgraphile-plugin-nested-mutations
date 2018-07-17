@@ -1,0 +1,2820 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`prints a schema with the nested mutations plugin 1`] = `
+"type Child implements Node {
+  id: Int!
+  name: String!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"Reads a single \`Parent\` that is related to this \`Child\`.\\"\\"\\"
+  parentByParentId: Parent
+  parentId: Int
+}
+
+\\"\\"\\"
+A condition to be used against \`Child\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input ChildCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`parentId\` field.\\"\\"\\"
+  parentId: Int
+}
+
+\\"\\"\\"An input for mutations affecting \`Child\`\\"\\"\\"
+input ChildInput {
+  id: Int
+  name: String!
+  parentId: Int
+  parentToParentId: ChildParentFkeyInput
+}
+
+\\"\\"\\"The fields on \`child\` to look up the row to connect.\\"\\"\\"
+input ChildParentFkeyChildConnectInput {
+  id: Int
+}
+
+\\"\\"\\"The \`child\` to be created by this mutation.\\"\\"\\"
+input ChildParentFkeyChildCreateInput {
+  id: Int
+  name: String!
+  parentToParentId: ChildParentFkeyInput
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`parent\` in the \`ChildInput\` mutation.
+\\"\\"\\"
+input ChildParentFkeyInput {
+  \\"\\"\\"The primary key(s) for \`parent\` for the far side of the relationship.\\"\\"\\"
+  connect: ChildParentFkeyParentConnectInput
+
+  \\"\\"\\"
+  A \`ParentInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: ChildParentFkeyParentCreateInput
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`child\` in the \`ParentInput\` mutation.
+\\"\\"\\"
+input ChildParentFkeyInverseInput {
+  \\"\\"\\"The primary key(s) for \`child\` for the far side of the relationship.\\"\\"\\"
+  connect: [ChildParentFkeyChildConnectInput!]
+
+  \\"\\"\\"
+  A \`ChildInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: [ChildParentFkeyChildCreateInput!]
+}
+
+\\"\\"\\"The fields on \`parent\` to look up the row to connect.\\"\\"\\"
+input ChildParentFkeyParentConnectInput {
+  id: Int
+}
+
+\\"\\"\\"The \`parent\` to be created by this mutation.\\"\\"\\"
+input ChildParentFkeyParentCreateInput {
+  childrenUsingId: ChildParentFkeyInverseInput
+  id: Int
+  name: String!
+}
+
+\\"\\"\\"
+Represents an update to a \`Child\`. Fields that are set will be updated.
+\\"\\"\\"
+input ChildPatch {
+  id: Int
+  name: String
+  parentId: Int
+}
+
+\\"\\"\\"A connection to a list of \`Child\` values.\\"\\"\\"
+type ChildrenConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Child\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [ChildrenEdge!]!
+
+  \\"\\"\\"A list of \`Child\` objects.\\"\\"\\"
+  nodes: [Child]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Child\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`Child\` edge in the connection.\\"\\"\\"
+type ChildrenEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Child\` at the end of the edge.\\"\\"\\"
+  node: Child
+}
+
+\\"\\"\\"Methods to use when ordering \`Child\`.\\"\\"\\"
+enum ChildrenOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type ChildUuid implements Node {
+  id: UUID!
+  name: String!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  parentId: UUID!
+
+  \\"\\"\\"Reads a single \`ParentUuid\` that is related to this \`ChildUuid\`.\\"\\"\\"
+  parentUuidByParentId: ParentUuid
+}
+
+\\"\\"\\"
+A condition to be used against \`ChildUuid\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input ChildUuidCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: UUID
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`parentId\` field.\\"\\"\\"
+  parentId: UUID
+}
+
+\\"\\"\\"An input for mutations affecting \`ChildUuid\`\\"\\"\\"
+input ChildUuidInput {
+  id: UUID
+  name: String!
+  parentId: UUID
+  parentUuidToParentId: ChildUuidParentUuidFkeyInput
+}
+
+\\"\\"\\"The fields on \`childUuid\` to look up the row to connect.\\"\\"\\"
+input ChildUuidParentUuidFkeyChildUuidConnectInput {
+  id: UUID
+}
+
+\\"\\"\\"The \`childUuid\` to be created by this mutation.\\"\\"\\"
+input ChildUuidParentUuidFkeyChildUuidCreateInput {
+  id: UUID
+  name: String!
+  parentUuidToParentId: ChildUuidParentUuidFkeyInput
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`parentUuid\` in the \`ChildUuidInput\` mutation.
+\\"\\"\\"
+input ChildUuidParentUuidFkeyInput {
+  \\"\\"\\"
+  The primary key(s) for \`parentUuid\` for the far side of the relationship.
+  \\"\\"\\"
+  connect: ChildUuidParentUuidFkeyParentUuidConnectInput
+
+  \\"\\"\\"
+  A \`ParentUuidInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: ChildUuidParentUuidFkeyParentUuidCreateInput
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`childUuid\` in the \`ParentUuidInput\` mutation.
+\\"\\"\\"
+input ChildUuidParentUuidFkeyInverseInput {
+  \\"\\"\\"
+  The primary key(s) for \`childUuid\` for the far side of the relationship.
+  \\"\\"\\"
+  connect: [ChildUuidParentUuidFkeyChildUuidConnectInput!]
+
+  \\"\\"\\"
+  A \`ChildUuidInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: [ChildUuidParentUuidFkeyChildUuidCreateInput!]
+}
+
+\\"\\"\\"The fields on \`parentUuid\` to look up the row to connect.\\"\\"\\"
+input ChildUuidParentUuidFkeyParentUuidConnectInput {
+  id: UUID
+}
+
+\\"\\"\\"The \`parentUuid\` to be created by this mutation.\\"\\"\\"
+input ChildUuidParentUuidFkeyParentUuidCreateInput {
+  childUuidsUsingId: ChildUuidParentUuidFkeyInverseInput
+  id: UUID
+  name: String!
+}
+
+\\"\\"\\"
+Represents an update to a \`ChildUuid\`. Fields that are set will be updated.
+\\"\\"\\"
+input ChildUuidPatch {
+  id: UUID
+  name: String
+  parentId: UUID
+}
+
+\\"\\"\\"A connection to a list of \`ChildUuid\` values.\\"\\"\\"
+type ChildUuidsConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`ChildUuid\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [ChildUuidsEdge!]!
+
+  \\"\\"\\"A list of \`ChildUuid\` objects.\\"\\"\\"
+  nodes: [ChildUuid]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`ChildUuid\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`ChildUuid\` edge in the connection.\\"\\"\\"
+type ChildUuidsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`ChildUuid\` at the end of the edge.\\"\\"\\"
+  node: ChildUuid
+}
+
+\\"\\"\\"Methods to use when ordering \`ChildUuid\`.\\"\\"\\"
+enum ChildUuidsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"All input for the create \`Child\` mutation.\\"\\"\\"
+input CreateChildInput {
+  \\"\\"\\"The \`Child\` to be created by this mutation.\\"\\"\\"
+  child: ChildInput!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our create \`Child\` mutation.\\"\\"\\"
+type CreateChildPayload {
+  \\"\\"\\"The \`Child\` that was created by this mutation.\\"\\"\\"
+  child: Child
+
+  \\"\\"\\"An edge for our \`Child\`. May be used by Relay 1.\\"\\"\\"
+  childEdge(
+    \\"\\"\\"The method to use when ordering \`Child\`.\\"\\"\\"
+    orderBy: [ChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildrenEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"Reads a single \`Parent\` that is related to this \`Child\`.\\"\\"\\"
+  parentByParentId: Parent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the create \`ChildUuid\` mutation.\\"\\"\\"
+input CreateChildUuidInput {
+  \\"\\"\\"The \`ChildUuid\` to be created by this mutation.\\"\\"\\"
+  childUuid: ChildUuidInput!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our create \`ChildUuid\` mutation.\\"\\"\\"
+type CreateChildUuidPayload {
+  \\"\\"\\"The \`ChildUuid\` that was created by this mutation.\\"\\"\\"
+  childUuid: ChildUuid
+
+  \\"\\"\\"An edge for our \`ChildUuid\`. May be used by Relay 1.\\"\\"\\"
+  childUuidEdge(
+    \\"\\"\\"The method to use when ordering \`ChildUuid\`.\\"\\"\\"
+    orderBy: [ChildUuidsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildUuidsEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"Reads a single \`ParentUuid\` that is related to this \`ChildUuid\`.\\"\\"\\"
+  parentUuidByParentId: ParentUuid
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the create \`MultiChild\` mutation.\\"\\"\\"
+input CreateMultiChildInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MultiChild\` to be created by this mutation.\\"\\"\\"
+  multiChild: MultiChildInput!
+}
+
+\\"\\"\\"The output of our create \`MultiChild\` mutation.\\"\\"\\"
+type CreateMultiChildPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MultiChild\` that was created by this mutation.\\"\\"\\"
+  multiChild: MultiChild
+
+  \\"\\"\\"An edge for our \`MultiChild\`. May be used by Relay 1.\\"\\"\\"
+  multiChildEdge(
+    \\"\\"\\"The method to use when ordering \`MultiChild\`.\\"\\"\\"
+    orderBy: [MultiChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MultiChildrenEdge
+
+  \\"\\"\\"Reads a single \`MultiParent\` that is related to this \`MultiChild\`.\\"\\"\\"
+  multiParentByParentIdAndParentName: MultiParent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the create \`MultiParent\` mutation.\\"\\"\\"
+input CreateMultiParentInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MultiParent\` to be created by this mutation.\\"\\"\\"
+  multiParent: MultiParentInput!
+}
+
+\\"\\"\\"The output of our create \`MultiParent\` mutation.\\"\\"\\"
+type CreateMultiParentPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MultiParent\` that was created by this mutation.\\"\\"\\"
+  multiParent: MultiParent
+
+  \\"\\"\\"An edge for our \`MultiParent\`. May be used by Relay 1.\\"\\"\\"
+  multiParentEdge(
+    \\"\\"\\"The method to use when ordering \`MultiParent\`.\\"\\"\\"
+    orderBy: [MultiParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MultiParentsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the create \`NamedChild\` mutation.\\"\\"\\"
+input CreateNamedChildInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`NamedChild\` to be created by this mutation.\\"\\"\\"
+  namedChild: NamedChildInput!
+}
+
+\\"\\"\\"The output of our create \`NamedChild\` mutation.\\"\\"\\"
+type CreateNamedChildPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`NamedChild\` that was created by this mutation.\\"\\"\\"
+  namedChild: NamedChild
+
+  \\"\\"\\"An edge for our \`NamedChild\`. May be used by Relay 1.\\"\\"\\"
+  namedChildEdge(
+    \\"\\"\\"The method to use when ordering \`NamedChild\`.\\"\\"\\"
+    orderBy: [NamedChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamedChildrenEdge
+
+  \\"\\"\\"Reads a single \`NamedParent\` that is related to this \`NamedChild\`.\\"\\"\\"
+  namedParentByParentId: NamedParent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the create \`NamedParent\` mutation.\\"\\"\\"
+input CreateNamedParentInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`NamedParent\` to be created by this mutation.\\"\\"\\"
+  namedParent: NamedParentInput!
+}
+
+\\"\\"\\"The output of our create \`NamedParent\` mutation.\\"\\"\\"
+type CreateNamedParentPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`NamedParent\` that was created by this mutation.\\"\\"\\"
+  namedParent: NamedParent
+
+  \\"\\"\\"An edge for our \`NamedParent\`. May be used by Relay 1.\\"\\"\\"
+  namedParentEdge(
+    \\"\\"\\"The method to use when ordering \`NamedParent\`.\\"\\"\\"
+    orderBy: [NamedParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamedParentsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the create \`Parent\` mutation.\\"\\"\\"
+input CreateParentInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Parent\` to be created by this mutation.\\"\\"\\"
+  parent: ParentInput!
+}
+
+\\"\\"\\"The output of our create \`Parent\` mutation.\\"\\"\\"
+type CreateParentPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Parent\` that was created by this mutation.\\"\\"\\"
+  parent: Parent
+
+  \\"\\"\\"An edge for our \`Parent\`. May be used by Relay 1.\\"\\"\\"
+  parentEdge(
+    \\"\\"\\"The method to use when ordering \`Parent\`.\\"\\"\\"
+    orderBy: [ParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ParentsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the create \`ParentUuid\` mutation.\\"\\"\\"
+input CreateParentUuidInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`ParentUuid\` to be created by this mutation.\\"\\"\\"
+  parentUuid: ParentUuidInput!
+}
+
+\\"\\"\\"The output of our create \`ParentUuid\` mutation.\\"\\"\\"
+type CreateParentUuidPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`ParentUuid\` that was created by this mutation.\\"\\"\\"
+  parentUuid: ParentUuid
+
+  \\"\\"\\"An edge for our \`ParentUuid\`. May be used by Relay 1.\\"\\"\\"
+  parentUuidEdge(
+    \\"\\"\\"The method to use when ordering \`ParentUuid\`.\\"\\"\\"
+    orderBy: [ParentUuidsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ParentUuidsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"A location in a connection that can be used for resuming pagination.\\"\\"\\"
+scalar Cursor
+
+\\"\\"\\"All input for the \`deleteChildById\` mutation.\\"\\"\\"
+input DeleteChildByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteChild\` mutation.\\"\\"\\"
+input DeleteChildInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Child\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Child\` mutation.\\"\\"\\"
+type DeleteChildPayload {
+  \\"\\"\\"The \`Child\` that was deleted by this mutation.\\"\\"\\"
+  child: Child
+
+  \\"\\"\\"An edge for our \`Child\`. May be used by Relay 1.\\"\\"\\"
+  childEdge(
+    \\"\\"\\"The method to use when ordering \`Child\`.\\"\\"\\"
+    orderBy: [ChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildrenEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedChildId: ID
+
+  \\"\\"\\"Reads a single \`Parent\` that is related to this \`Child\`.\\"\\"\\"
+  parentByParentId: Parent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteChildUuidById\` mutation.\\"\\"\\"
+input DeleteChildUuidByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: UUID!
+}
+
+\\"\\"\\"All input for the \`deleteChildUuid\` mutation.\\"\\"\\"
+input DeleteChildUuidInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`ChildUuid\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`ChildUuid\` mutation.\\"\\"\\"
+type DeleteChildUuidPayload {
+  \\"\\"\\"The \`ChildUuid\` that was deleted by this mutation.\\"\\"\\"
+  childUuid: ChildUuid
+
+  \\"\\"\\"An edge for our \`ChildUuid\`. May be used by Relay 1.\\"\\"\\"
+  childUuidEdge(
+    \\"\\"\\"The method to use when ordering \`ChildUuid\`.\\"\\"\\"
+    orderBy: [ChildUuidsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildUuidsEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedChildUuidId: ID
+
+  \\"\\"\\"Reads a single \`ParentUuid\` that is related to this \`ChildUuid\`.\\"\\"\\"
+  parentUuidByParentId: ParentUuid
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteMultiChildById\` mutation.\\"\\"\\"
+input DeleteMultiChildByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteMultiChild\` mutation.\\"\\"\\"
+input DeleteMultiChildInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MultiChild\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`MultiChild\` mutation.\\"\\"\\"
+type DeleteMultiChildPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedMultiChildId: ID
+
+  \\"\\"\\"The \`MultiChild\` that was deleted by this mutation.\\"\\"\\"
+  multiChild: MultiChild
+
+  \\"\\"\\"An edge for our \`MultiChild\`. May be used by Relay 1.\\"\\"\\"
+  multiChildEdge(
+    \\"\\"\\"The method to use when ordering \`MultiChild\`.\\"\\"\\"
+    orderBy: [MultiChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MultiChildrenEdge
+
+  \\"\\"\\"Reads a single \`MultiParent\` that is related to this \`MultiChild\`.\\"\\"\\"
+  multiParentByParentIdAndParentName: MultiParent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteMultiParentByIdAndName\` mutation.\\"\\"\\"
+input DeleteMultiParentByIdAndNameInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+  name: String!
+}
+
+\\"\\"\\"All input for the \`deleteMultiParent\` mutation.\\"\\"\\"
+input DeleteMultiParentInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MultiParent\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`MultiParent\` mutation.\\"\\"\\"
+type DeleteMultiParentPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedMultiParentId: ID
+
+  \\"\\"\\"The \`MultiParent\` that was deleted by this mutation.\\"\\"\\"
+  multiParent: MultiParent
+
+  \\"\\"\\"An edge for our \`MultiParent\`. May be used by Relay 1.\\"\\"\\"
+  multiParentEdge(
+    \\"\\"\\"The method to use when ordering \`MultiParent\`.\\"\\"\\"
+    orderBy: [MultiParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MultiParentsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteNamedChildById\` mutation.\\"\\"\\"
+input DeleteNamedChildByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteNamedChild\` mutation.\\"\\"\\"
+input DeleteNamedChildInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`NamedChild\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`NamedChild\` mutation.\\"\\"\\"
+type DeleteNamedChildPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedNamedChildId: ID
+
+  \\"\\"\\"The \`NamedChild\` that was deleted by this mutation.\\"\\"\\"
+  namedChild: NamedChild
+
+  \\"\\"\\"An edge for our \`NamedChild\`. May be used by Relay 1.\\"\\"\\"
+  namedChildEdge(
+    \\"\\"\\"The method to use when ordering \`NamedChild\`.\\"\\"\\"
+    orderBy: [NamedChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamedChildrenEdge
+
+  \\"\\"\\"Reads a single \`NamedParent\` that is related to this \`NamedChild\`.\\"\\"\\"
+  namedParentByParentId: NamedParent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteNamedParentById\` mutation.\\"\\"\\"
+input DeleteNamedParentByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteNamedParent\` mutation.\\"\\"\\"
+input DeleteNamedParentInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`NamedParent\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`NamedParent\` mutation.\\"\\"\\"
+type DeleteNamedParentPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedNamedParentId: ID
+
+  \\"\\"\\"The \`NamedParent\` that was deleted by this mutation.\\"\\"\\"
+  namedParent: NamedParent
+
+  \\"\\"\\"An edge for our \`NamedParent\`. May be used by Relay 1.\\"\\"\\"
+  namedParentEdge(
+    \\"\\"\\"The method to use when ordering \`NamedParent\`.\\"\\"\\"
+    orderBy: [NamedParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamedParentsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteParentById\` mutation.\\"\\"\\"
+input DeleteParentByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`deleteParent\` mutation.\\"\\"\\"
+input DeleteParentInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Parent\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`Parent\` mutation.\\"\\"\\"
+type DeleteParentPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedParentId: ID
+
+  \\"\\"\\"The \`Parent\` that was deleted by this mutation.\\"\\"\\"
+  parent: Parent
+
+  \\"\\"\\"An edge for our \`Parent\`. May be used by Relay 1.\\"\\"\\"
+  parentEdge(
+    \\"\\"\\"The method to use when ordering \`Parent\`.\\"\\"\\"
+    orderBy: [ParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ParentsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`deleteParentUuidById\` mutation.\\"\\"\\"
+input DeleteParentUuidByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: UUID!
+}
+
+\\"\\"\\"All input for the \`deleteParentUuid\` mutation.\\"\\"\\"
+input DeleteParentUuidInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`ParentUuid\` to be deleted.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our delete \`ParentUuid\` mutation.\\"\\"\\"
+type DeleteParentUuidPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+  deletedParentUuidId: ID
+
+  \\"\\"\\"The \`ParentUuid\` that was deleted by this mutation.\\"\\"\\"
+  parentUuid: ParentUuid
+
+  \\"\\"\\"An edge for our \`ParentUuid\`. May be used by Relay 1.\\"\\"\\"
+  parentUuidEdge(
+    \\"\\"\\"The method to use when ordering \`ParentUuid\`.\\"\\"\\"
+    orderBy: [ParentUuidsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ParentUuidsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+type MultiChild implements Node {
+  id: Int!
+
+  \\"\\"\\"Reads a single \`MultiParent\` that is related to this \`MultiChild\`.\\"\\"\\"
+  multiParentByParentIdAndParentName: MultiParent
+  name: String!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  parentId: Int!
+  parentName: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`MultiChild\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input MultiChildCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`parentId\` field.\\"\\"\\"
+  parentId: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`parentName\` field.\\"\\"\\"
+  parentName: String
+}
+
+\\"\\"\\"An input for mutations affecting \`MultiChild\`\\"\\"\\"
+input MultiChildInput {
+  id: Int
+  multiParentToParentIdAndParentName: MultiChildMultiParentFkeyInput
+  name: String!
+  parentId: Int
+  parentName: String
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`multiParent\` in the \`MultiChildInput\` mutation.
+\\"\\"\\"
+input MultiChildMultiParentFkeyInput {
+  \\"\\"\\"
+  The primary key(s) for \`multiParent\` for the far side of the relationship.
+  \\"\\"\\"
+  connect: MultiChildMultiParentFkeyMultiParentConnectInput
+
+  \\"\\"\\"
+  A \`MultiParentInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: MultiChildMultiParentFkeyMultiParentCreateInput
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`multiChild\` in the \`MultiParentInput\` mutation.
+\\"\\"\\"
+input MultiChildMultiParentFkeyInverseInput {
+  \\"\\"\\"
+  The primary key(s) for \`multiChild\` for the far side of the relationship.
+  \\"\\"\\"
+  connect: [MultiChildMultiParentFkeyMultiChildConnectInput!]
+
+  \\"\\"\\"
+  A \`MultiChildInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: [MultiChildMultiParentFkeyMultiChildCreateInput!]
+}
+
+\\"\\"\\"The fields on \`multiChild\` to look up the row to connect.\\"\\"\\"
+input MultiChildMultiParentFkeyMultiChildConnectInput {
+  id: Int
+  name: String!
+}
+
+\\"\\"\\"The \`multiChild\` to be created by this mutation.\\"\\"\\"
+input MultiChildMultiParentFkeyMultiChildCreateInput {
+  id: Int
+  multiParentToParentIdAndParentName: MultiChildMultiParentFkeyInput
+  name: String!
+}
+
+\\"\\"\\"The fields on \`multiParent\` to look up the row to connect.\\"\\"\\"
+input MultiChildMultiParentFkeyMultiParentConnectInput {
+  id: Int
+  name: String!
+}
+
+\\"\\"\\"The \`multiParent\` to be created by this mutation.\\"\\"\\"
+input MultiChildMultiParentFkeyMultiParentCreateInput {
+  id: Int
+  multiChildrenUsingIdAndName: MultiChildMultiParentFkeyInverseInput
+  name: String!
+}
+
+\\"\\"\\"
+Represents an update to a \`MultiChild\`. Fields that are set will be updated.
+\\"\\"\\"
+input MultiChildPatch {
+  id: Int
+  name: String
+  parentId: Int
+  parentName: String
+}
+
+\\"\\"\\"A connection to a list of \`MultiChild\` values.\\"\\"\\"
+type MultiChildrenConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`MultiChild\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [MultiChildrenEdge!]!
+
+  \\"\\"\\"A list of \`MultiChild\` objects.\\"\\"\\"
+  nodes: [MultiChild]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`MultiChild\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`MultiChild\` edge in the connection.\\"\\"\\"
+type MultiChildrenEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`MultiChild\` at the end of the edge.\\"\\"\\"
+  node: MultiChild
+}
+
+\\"\\"\\"Methods to use when ordering \`MultiChild\`.\\"\\"\\"
+enum MultiChildrenOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PARENT_NAME_ASC
+  PARENT_NAME_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type MultiParent implements Node {
+  id: Int!
+
+  \\"\\"\\"Reads and enables pagination through a set of \`MultiChild\`.\\"\\"\\"
+  multiChildrenByParentIdAndParentName(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: MultiChildCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`MultiChild\`.\\"\\"\\"
+    orderBy: [MultiChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MultiChildrenConnection!
+  name: String!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+A condition to be used against \`MultiParent\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input MultiParentCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+}
+
+\\"\\"\\"An input for mutations affecting \`MultiParent\`\\"\\"\\"
+input MultiParentInput {
+  id: Int
+  multiChildrenUsingIdAndName: MultiChildMultiParentFkeyInverseInput
+  name: String!
+}
+
+\\"\\"\\"
+Represents an update to a \`MultiParent\`. Fields that are set will be updated.
+\\"\\"\\"
+input MultiParentPatch {
+  id: Int
+  name: String
+}
+
+\\"\\"\\"A connection to a list of \`MultiParent\` values.\\"\\"\\"
+type MultiParentsConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`MultiParent\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [MultiParentsEdge!]!
+
+  \\"\\"\\"A list of \`MultiParent\` objects.\\"\\"\\"
+  nodes: [MultiParent]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`MultiParent\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`MultiParent\` edge in the connection.\\"\\"\\"
+type MultiParentsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`MultiParent\` at the end of the edge.\\"\\"\\"
+  node: MultiParent
+}
+
+\\"\\"\\"Methods to use when ordering \`MultiParent\`.\\"\\"\\"
+enum MultiParentsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"
+The root mutation type which contains root level fields which mutate data.
+\\"\\"\\"
+type Mutation {
+  \\"\\"\\"Creates a single \`Child\`.\\"\\"\\"
+  createChild(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateChildInput!
+  ): CreateChildPayload
+
+  \\"\\"\\"Creates a single \`ChildUuid\`.\\"\\"\\"
+  createChildUuid(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateChildUuidInput!
+  ): CreateChildUuidPayload
+
+  \\"\\"\\"Creates a single \`MultiChild\`.\\"\\"\\"
+  createMultiChild(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateMultiChildInput!
+  ): CreateMultiChildPayload
+
+  \\"\\"\\"Creates a single \`MultiParent\`.\\"\\"\\"
+  createMultiParent(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateMultiParentInput!
+  ): CreateMultiParentPayload
+
+  \\"\\"\\"Creates a single \`NamedChild\`.\\"\\"\\"
+  createNamedChild(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateNamedChildInput!
+  ): CreateNamedChildPayload
+
+  \\"\\"\\"Creates a single \`NamedParent\`.\\"\\"\\"
+  createNamedParent(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateNamedParentInput!
+  ): CreateNamedParentPayload
+
+  \\"\\"\\"Creates a single \`Parent\`.\\"\\"\\"
+  createParent(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateParentInput!
+  ): CreateParentPayload
+
+  \\"\\"\\"Creates a single \`ParentUuid\`.\\"\\"\\"
+  createParentUuid(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateParentUuidInput!
+  ): CreateParentUuidPayload
+
+  \\"\\"\\"Deletes a single \`Child\` using its globally unique id.\\"\\"\\"
+  deleteChild(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteChildInput!
+  ): DeleteChildPayload
+
+  \\"\\"\\"Deletes a single \`Child\` using a unique key.\\"\\"\\"
+  deleteChildById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteChildByIdInput!
+  ): DeleteChildPayload
+
+  \\"\\"\\"Deletes a single \`ChildUuid\` using its globally unique id.\\"\\"\\"
+  deleteChildUuid(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteChildUuidInput!
+  ): DeleteChildUuidPayload
+
+  \\"\\"\\"Deletes a single \`ChildUuid\` using a unique key.\\"\\"\\"
+  deleteChildUuidById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteChildUuidByIdInput!
+  ): DeleteChildUuidPayload
+
+  \\"\\"\\"Deletes a single \`MultiChild\` using its globally unique id.\\"\\"\\"
+  deleteMultiChild(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMultiChildInput!
+  ): DeleteMultiChildPayload
+
+  \\"\\"\\"Deletes a single \`MultiChild\` using a unique key.\\"\\"\\"
+  deleteMultiChildById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMultiChildByIdInput!
+  ): DeleteMultiChildPayload
+
+  \\"\\"\\"Deletes a single \`MultiParent\` using its globally unique id.\\"\\"\\"
+  deleteMultiParent(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMultiParentInput!
+  ): DeleteMultiParentPayload
+
+  \\"\\"\\"Deletes a single \`MultiParent\` using a unique key.\\"\\"\\"
+  deleteMultiParentByIdAndName(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteMultiParentByIdAndNameInput!
+  ): DeleteMultiParentPayload
+
+  \\"\\"\\"Deletes a single \`NamedChild\` using its globally unique id.\\"\\"\\"
+  deleteNamedChild(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNamedChildInput!
+  ): DeleteNamedChildPayload
+
+  \\"\\"\\"Deletes a single \`NamedChild\` using a unique key.\\"\\"\\"
+  deleteNamedChildById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNamedChildByIdInput!
+  ): DeleteNamedChildPayload
+
+  \\"\\"\\"Deletes a single \`NamedParent\` using its globally unique id.\\"\\"\\"
+  deleteNamedParent(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNamedParentInput!
+  ): DeleteNamedParentPayload
+
+  \\"\\"\\"Deletes a single \`NamedParent\` using a unique key.\\"\\"\\"
+  deleteNamedParentById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteNamedParentByIdInput!
+  ): DeleteNamedParentPayload
+
+  \\"\\"\\"Deletes a single \`Parent\` using its globally unique id.\\"\\"\\"
+  deleteParent(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteParentInput!
+  ): DeleteParentPayload
+
+  \\"\\"\\"Deletes a single \`Parent\` using a unique key.\\"\\"\\"
+  deleteParentById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteParentByIdInput!
+  ): DeleteParentPayload
+
+  \\"\\"\\"Deletes a single \`ParentUuid\` using its globally unique id.\\"\\"\\"
+  deleteParentUuid(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteParentUuidInput!
+  ): DeleteParentUuidPayload
+
+  \\"\\"\\"Deletes a single \`ParentUuid\` using a unique key.\\"\\"\\"
+  deleteParentUuidById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: DeleteParentUuidByIdInput!
+  ): DeleteParentUuidPayload
+
+  \\"\\"\\"Updates a single \`Child\` using its globally unique id and a patch.\\"\\"\\"
+  updateChild(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateChildInput!
+  ): UpdateChildPayload
+
+  \\"\\"\\"Updates a single \`Child\` using a unique key and a patch.\\"\\"\\"
+  updateChildById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateChildByIdInput!
+  ): UpdateChildPayload
+
+  \\"\\"\\"
+  Updates a single \`ChildUuid\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateChildUuid(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateChildUuidInput!
+  ): UpdateChildUuidPayload
+
+  \\"\\"\\"Updates a single \`ChildUuid\` using a unique key and a patch.\\"\\"\\"
+  updateChildUuidById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateChildUuidByIdInput!
+  ): UpdateChildUuidPayload
+
+  \\"\\"\\"
+  Updates a single \`MultiChild\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateMultiChild(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMultiChildInput!
+  ): UpdateMultiChildPayload
+
+  \\"\\"\\"Updates a single \`MultiChild\` using a unique key and a patch.\\"\\"\\"
+  updateMultiChildById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMultiChildByIdInput!
+  ): UpdateMultiChildPayload
+
+  \\"\\"\\"
+  Updates a single \`MultiParent\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateMultiParent(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMultiParentInput!
+  ): UpdateMultiParentPayload
+
+  \\"\\"\\"Updates a single \`MultiParent\` using a unique key and a patch.\\"\\"\\"
+  updateMultiParentByIdAndName(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateMultiParentByIdAndNameInput!
+  ): UpdateMultiParentPayload
+
+  \\"\\"\\"
+  Updates a single \`NamedChild\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateNamedChild(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNamedChildInput!
+  ): UpdateNamedChildPayload
+
+  \\"\\"\\"Updates a single \`NamedChild\` using a unique key and a patch.\\"\\"\\"
+  updateNamedChildById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNamedChildByIdInput!
+  ): UpdateNamedChildPayload
+
+  \\"\\"\\"
+  Updates a single \`NamedParent\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateNamedParent(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNamedParentInput!
+  ): UpdateNamedParentPayload
+
+  \\"\\"\\"Updates a single \`NamedParent\` using a unique key and a patch.\\"\\"\\"
+  updateNamedParentById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateNamedParentByIdInput!
+  ): UpdateNamedParentPayload
+
+  \\"\\"\\"Updates a single \`Parent\` using its globally unique id and a patch.\\"\\"\\"
+  updateParent(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateParentInput!
+  ): UpdateParentPayload
+
+  \\"\\"\\"Updates a single \`Parent\` using a unique key and a patch.\\"\\"\\"
+  updateParentById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateParentByIdInput!
+  ): UpdateParentPayload
+
+  \\"\\"\\"
+  Updates a single \`ParentUuid\` using its globally unique id and a patch.
+  \\"\\"\\"
+  updateParentUuid(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateParentUuidInput!
+  ): UpdateParentUuidPayload
+
+  \\"\\"\\"Updates a single \`ParentUuid\` using a unique key and a patch.\\"\\"\\"
+  updateParentUuidById(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: UpdateParentUuidByIdInput!
+  ): UpdateParentUuidPayload
+}
+
+type NamedChild implements Node {
+  id: Int!
+  name: String!
+
+  \\"\\"\\"Reads a single \`NamedParent\` that is related to this \`NamedChild\`.\\"\\"\\"
+  namedParentByParentId: NamedParent
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+  parentId: Int
+}
+
+\\"\\"\\"
+A condition to be used against \`NamedChild\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input NamedChildCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`parentId\` field.\\"\\"\\"
+  parentId: Int
+}
+
+\\"\\"\\"An input for mutations affecting \`NamedChild\`\\"\\"\\"
+input NamedChildInput {
+  id: Int
+  name: String!
+  parent: ParentChildRelationInput
+  parentId: Int
+}
+
+\\"\\"\\"
+Represents an update to a \`NamedChild\`. Fields that are set will be updated.
+\\"\\"\\"
+input NamedChildPatch {
+  id: Int
+  name: String
+  parentId: Int
+}
+
+\\"\\"\\"A connection to a list of \`NamedChild\` values.\\"\\"\\"
+type NamedChildrenConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`NamedChild\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [NamedChildrenEdge!]!
+
+  \\"\\"\\"A list of \`NamedChild\` objects.\\"\\"\\"
+  nodes: [NamedChild]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`NamedChild\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`NamedChild\` edge in the connection.\\"\\"\\"
+type NamedChildrenEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`NamedChild\` at the end of the edge.\\"\\"\\"
+  node: NamedChild
+}
+
+\\"\\"\\"Methods to use when ordering \`NamedChild\`.\\"\\"\\"
+enum NamedChildrenOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type NamedParent implements Node {
+  id: Int!
+  name: String!
+
+  \\"\\"\\"Reads and enables pagination through a set of \`NamedChild\`.\\"\\"\\"
+  namedChildrenByParentId(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: NamedChildCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`NamedChild\`.\\"\\"\\"
+    orderBy: [NamedChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamedChildrenConnection!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+A condition to be used against \`NamedParent\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input NamedParentCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+}
+
+\\"\\"\\"An input for mutations affecting \`NamedParent\`\\"\\"\\"
+input NamedParentInput {
+  children: ParentChildRelationInverseInput
+  id: Int
+  name: String!
+}
+
+\\"\\"\\"
+Represents an update to a \`NamedParent\`. Fields that are set will be updated.
+\\"\\"\\"
+input NamedParentPatch {
+  id: Int
+  name: String
+}
+
+\\"\\"\\"A connection to a list of \`NamedParent\` values.\\"\\"\\"
+type NamedParentsConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`NamedParent\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [NamedParentsEdge!]!
+
+  \\"\\"\\"A list of \`NamedParent\` objects.\\"\\"\\"
+  nodes: [NamedParent]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`NamedParent\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`NamedParent\` edge in the connection.\\"\\"\\"
+type NamedParentsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`NamedParent\` at the end of the edge.\\"\\"\\"
+  node: NamedParent
+}
+
+\\"\\"\\"Methods to use when ordering \`NamedParent\`.\\"\\"\\"
+enum NamedParentsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+interface Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"Information about pagination in a connection.\\"\\"\\"
+type PageInfo {
+  \\"\\"\\"When paginating forwards, the cursor to continue.\\"\\"\\"
+  endCursor: Cursor
+
+  \\"\\"\\"When paginating forwards, are there more items?\\"\\"\\"
+  hasNextPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, are there more items?\\"\\"\\"
+  hasPreviousPage: Boolean!
+
+  \\"\\"\\"When paginating backwards, the cursor to continue.\\"\\"\\"
+  startCursor: Cursor
+}
+
+type Parent implements Node {
+  \\"\\"\\"Reads and enables pagination through a set of \`Child\`.\\"\\"\\"
+  childrenByParentId(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ChildCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Child\`.\\"\\"\\"
+    orderBy: [ChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildrenConnection!
+  id: Int!
+  name: String!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`namedParent\` in the \`NamedChildInput\` mutation.
+\\"\\"\\"
+input ParentChildRelationInput {
+  \\"\\"\\"
+  The primary key(s) for \`namedParent\` for the far side of the relationship.
+  \\"\\"\\"
+  connect: ParentChildRelationNamedParentConnectInput
+
+  \\"\\"\\"
+  A \`NamedParentInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: ParentChildRelationNamedParentCreateInput
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`namedChild\` in the \`NamedParentInput\` mutation.
+\\"\\"\\"
+input ParentChildRelationInverseInput {
+  \\"\\"\\"
+  The primary key(s) for \`namedChild\` for the far side of the relationship.
+  \\"\\"\\"
+  connect: [ParentChildRelationNamedChildConnectInput!]
+
+  \\"\\"\\"
+  A \`NamedChildInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: [ParentChildRelationNamedChildCreateInput!]
+}
+
+\\"\\"\\"The fields on \`namedChild\` to look up the row to connect.\\"\\"\\"
+input ParentChildRelationNamedChildConnectInput {
+  id: Int
+}
+
+\\"\\"\\"The \`namedChild\` to be created by this mutation.\\"\\"\\"
+input ParentChildRelationNamedChildCreateInput {
+  id: Int
+  name: String!
+  parent: ParentChildRelationInput
+}
+
+\\"\\"\\"The fields on \`namedParent\` to look up the row to connect.\\"\\"\\"
+input ParentChildRelationNamedParentConnectInput {
+  id: Int
+}
+
+\\"\\"\\"The \`namedParent\` to be created by this mutation.\\"\\"\\"
+input ParentChildRelationNamedParentCreateInput {
+  children: ParentChildRelationInverseInput
+  id: Int
+  name: String!
+}
+
+\\"\\"\\"
+A condition to be used against \`Parent\` object types. All fields are tested for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input ParentCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: Int
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+}
+
+\\"\\"\\"An input for mutations affecting \`Parent\`\\"\\"\\"
+input ParentInput {
+  childrenUsingId: ChildParentFkeyInverseInput
+  id: Int
+  name: String!
+}
+
+\\"\\"\\"
+Represents an update to a \`Parent\`. Fields that are set will be updated.
+\\"\\"\\"
+input ParentPatch {
+  id: Int
+  name: String
+}
+
+\\"\\"\\"A connection to a list of \`Parent\` values.\\"\\"\\"
+type ParentsConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`Parent\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [ParentsEdge!]!
+
+  \\"\\"\\"A list of \`Parent\` objects.\\"\\"\\"
+  nodes: [Parent]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`Parent\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`Parent\` edge in the connection.\\"\\"\\"
+type ParentsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`Parent\` at the end of the edge.\\"\\"\\"
+  node: Parent
+}
+
+\\"\\"\\"Methods to use when ordering \`Parent\`.\\"\\"\\"
+enum ParentsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+type ParentUuid implements Node {
+  \\"\\"\\"Reads and enables pagination through a set of \`ChildUuid\`.\\"\\"\\"
+  childUuidsByParentId(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ChildUuidCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`ChildUuid\`.\\"\\"\\"
+    orderBy: [ChildUuidsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildUuidsConnection!
+  id: UUID!
+  name: String!
+
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"
+A condition to be used against \`ParentUuid\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input ParentUuidCondition {
+  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
+  id: UUID
+
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+}
+
+\\"\\"\\"An input for mutations affecting \`ParentUuid\`\\"\\"\\"
+input ParentUuidInput {
+  childUuidsUsingId: ChildUuidParentUuidFkeyInverseInput
+  id: UUID
+  name: String!
+}
+
+\\"\\"\\"
+Represents an update to a \`ParentUuid\`. Fields that are set will be updated.
+\\"\\"\\"
+input ParentUuidPatch {
+  id: UUID
+  name: String
+}
+
+\\"\\"\\"A connection to a list of \`ParentUuid\` values.\\"\\"\\"
+type ParentUuidsConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`ParentUuid\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [ParentUuidsEdge!]!
+
+  \\"\\"\\"A list of \`ParentUuid\` objects.\\"\\"\\"
+  nodes: [ParentUuid]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`ParentUuid\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`ParentUuid\` edge in the connection.\\"\\"\\"
+type ParentUuidsEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`ParentUuid\` at the end of the edge.\\"\\"\\"
+  node: ParentUuid
+}
+
+\\"\\"\\"Methods to use when ordering \`ParentUuid\`.\\"\\"\\"
+enum ParentUuidsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+type Query implements Node {
+  \\"\\"\\"Reads and enables pagination through a set of \`ChildUuid\`.\\"\\"\\"
+  allChildUuids(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ChildUuidCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`ChildUuid\`.\\"\\"\\"
+    orderBy: [ChildUuidsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildUuidsConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Child\`.\\"\\"\\"
+  allChildren(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ChildCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Child\`.\\"\\"\\"
+    orderBy: [ChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildrenConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`MultiChild\`.\\"\\"\\"
+  allMultiChildren(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: MultiChildCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`MultiChild\`.\\"\\"\\"
+    orderBy: [MultiChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MultiChildrenConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`MultiParent\`.\\"\\"\\"
+  allMultiParents(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: MultiParentCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`MultiParent\`.\\"\\"\\"
+    orderBy: [MultiParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MultiParentsConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`NamedChild\`.\\"\\"\\"
+  allNamedChildren(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: NamedChildCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`NamedChild\`.\\"\\"\\"
+    orderBy: [NamedChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamedChildrenConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`NamedParent\`.\\"\\"\\"
+  allNamedParents(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: NamedParentCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`NamedParent\`.\\"\\"\\"
+    orderBy: [NamedParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamedParentsConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`ParentUuid\`.\\"\\"\\"
+  allParentUuids(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ParentUuidCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`ParentUuid\`.\\"\\"\\"
+    orderBy: [ParentUuidsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ParentUuidsConnection
+
+  \\"\\"\\"Reads and enables pagination through a set of \`Parent\`.\\"\\"\\"
+  allParents(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ParentCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`Parent\`.\\"\\"\\"
+    orderBy: [ParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ParentsConnection
+
+  \\"\\"\\"Reads a single \`Child\` using its globally unique \`ID\`.\\"\\"\\"
+  child(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Child\`.\\"\\"\\"
+    nodeId: ID!
+  ): Child
+  childById(id: Int!): Child
+
+  \\"\\"\\"Reads a single \`ChildUuid\` using its globally unique \`ID\`.\\"\\"\\"
+  childUuid(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`ChildUuid\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): ChildUuid
+  childUuidById(id: UUID!): ChildUuid
+
+  \\"\\"\\"Reads a single \`MultiChild\` using its globally unique \`ID\`.\\"\\"\\"
+  multiChild(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`MultiChild\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): MultiChild
+  multiChildById(id: Int!): MultiChild
+
+  \\"\\"\\"Reads a single \`MultiParent\` using its globally unique \`ID\`.\\"\\"\\"
+  multiParent(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`MultiParent\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): MultiParent
+  multiParentByIdAndName(id: Int!, name: String!): MultiParent
+
+  \\"\\"\\"Reads a single \`NamedChild\` using its globally unique \`ID\`.\\"\\"\\"
+  namedChild(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`NamedChild\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): NamedChild
+  namedChildById(id: Int!): NamedChild
+
+  \\"\\"\\"Reads a single \`NamedParent\` using its globally unique \`ID\`.\\"\\"\\"
+  namedParent(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`NamedParent\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): NamedParent
+  namedParentById(id: Int!): NamedParent
+
+  \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
+  node(
+    \\"\\"\\"The globally unique \`ID\`.\\"\\"\\"
+    nodeId: ID!
+  ): Node
+
+  \\"\\"\\"
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"Reads a single \`Parent\` using its globally unique \`ID\`.\\"\\"\\"
+  parent(
+    \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Parent\`.\\"\\"\\"
+    nodeId: ID!
+  ): Parent
+  parentById(id: Int!): Parent
+
+  \\"\\"\\"Reads a single \`ParentUuid\` using its globally unique \`ID\`.\\"\\"\\"
+  parentUuid(
+    \\"\\"\\"
+    The globally unique \`ID\` to be used in selecting a single \`ParentUuid\`.
+    \\"\\"\\"
+    nodeId: ID!
+  ): ParentUuid
+  parentUuidById(id: UUID!): ParentUuid
+
+  \\"\\"\\"
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  \\"\\"\\"
+  query: Query!
+}
+
+\\"\\"\\"All input for the \`updateChildById\` mutation.\\"\\"\\"
+input UpdateChildByIdInput {
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Child\` being updated.
+  \\"\\"\\"
+  childPatch: ChildPatch!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+}
+
+\\"\\"\\"All input for the \`updateChild\` mutation.\\"\\"\\"
+input UpdateChildInput {
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Child\` being updated.
+  \\"\\"\\"
+  childPatch: ChildPatch!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Child\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`Child\` mutation.\\"\\"\\"
+type UpdateChildPayload {
+  \\"\\"\\"The \`Child\` that was updated by this mutation.\\"\\"\\"
+  child: Child
+
+  \\"\\"\\"An edge for our \`Child\`. May be used by Relay 1.\\"\\"\\"
+  childEdge(
+    \\"\\"\\"The method to use when ordering \`Child\`.\\"\\"\\"
+    orderBy: [ChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildrenEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"Reads a single \`Parent\` that is related to this \`Child\`.\\"\\"\\"
+  parentByParentId: Parent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateChildUuidById\` mutation.\\"\\"\\"
+input UpdateChildUuidByIdInput {
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`ChildUuid\` being updated.
+  \\"\\"\\"
+  childUuidPatch: ChildUuidPatch!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: UUID!
+}
+
+\\"\\"\\"All input for the \`updateChildUuid\` mutation.\\"\\"\\"
+input UpdateChildUuidInput {
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`ChildUuid\` being updated.
+  \\"\\"\\"
+  childUuidPatch: ChildUuidPatch!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`ChildUuid\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`ChildUuid\` mutation.\\"\\"\\"
+type UpdateChildUuidPayload {
+  \\"\\"\\"The \`ChildUuid\` that was updated by this mutation.\\"\\"\\"
+  childUuid: ChildUuid
+
+  \\"\\"\\"An edge for our \`ChildUuid\`. May be used by Relay 1.\\"\\"\\"
+  childUuidEdge(
+    \\"\\"\\"The method to use when ordering \`ChildUuid\`.\\"\\"\\"
+    orderBy: [ChildUuidsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ChildUuidsEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"Reads a single \`ParentUuid\` that is related to this \`ChildUuid\`.\\"\\"\\"
+  parentUuidByParentId: ParentUuid
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateMultiChildById\` mutation.\\"\\"\\"
+input UpdateMultiChildByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MultiChild\` being updated.
+  \\"\\"\\"
+  multiChildPatch: MultiChildPatch!
+}
+
+\\"\\"\\"All input for the \`updateMultiChild\` mutation.\\"\\"\\"
+input UpdateMultiChildInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MultiChild\` being updated.
+  \\"\\"\\"
+  multiChildPatch: MultiChildPatch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MultiChild\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`MultiChild\` mutation.\\"\\"\\"
+type UpdateMultiChildPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MultiChild\` that was updated by this mutation.\\"\\"\\"
+  multiChild: MultiChild
+
+  \\"\\"\\"An edge for our \`MultiChild\`. May be used by Relay 1.\\"\\"\\"
+  multiChildEdge(
+    \\"\\"\\"The method to use when ordering \`MultiChild\`.\\"\\"\\"
+    orderBy: [MultiChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MultiChildrenEdge
+
+  \\"\\"\\"Reads a single \`MultiParent\` that is related to this \`MultiChild\`.\\"\\"\\"
+  multiParentByParentIdAndParentName: MultiParent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateMultiParentByIdAndName\` mutation.\\"\\"\\"
+input UpdateMultiParentByIdAndNameInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MultiParent\` being updated.
+  \\"\\"\\"
+  multiParentPatch: MultiParentPatch!
+  name: String!
+}
+
+\\"\\"\\"All input for the \`updateMultiParent\` mutation.\\"\\"\\"
+input UpdateMultiParentInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`MultiParent\` being updated.
+  \\"\\"\\"
+  multiParentPatch: MultiParentPatch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`MultiParent\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`MultiParent\` mutation.\\"\\"\\"
+type UpdateMultiParentPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`MultiParent\` that was updated by this mutation.\\"\\"\\"
+  multiParent: MultiParent
+
+  \\"\\"\\"An edge for our \`MultiParent\`. May be used by Relay 1.\\"\\"\\"
+  multiParentEdge(
+    \\"\\"\\"The method to use when ordering \`MultiParent\`.\\"\\"\\"
+    orderBy: [MultiParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): MultiParentsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateNamedChildById\` mutation.\\"\\"\\"
+input UpdateNamedChildByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`NamedChild\` being updated.
+  \\"\\"\\"
+  namedChildPatch: NamedChildPatch!
+}
+
+\\"\\"\\"All input for the \`updateNamedChild\` mutation.\\"\\"\\"
+input UpdateNamedChildInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`NamedChild\` being updated.
+  \\"\\"\\"
+  namedChildPatch: NamedChildPatch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`NamedChild\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`NamedChild\` mutation.\\"\\"\\"
+type UpdateNamedChildPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`NamedChild\` that was updated by this mutation.\\"\\"\\"
+  namedChild: NamedChild
+
+  \\"\\"\\"An edge for our \`NamedChild\`. May be used by Relay 1.\\"\\"\\"
+  namedChildEdge(
+    \\"\\"\\"The method to use when ordering \`NamedChild\`.\\"\\"\\"
+    orderBy: [NamedChildrenOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamedChildrenEdge
+
+  \\"\\"\\"Reads a single \`NamedParent\` that is related to this \`NamedChild\`.\\"\\"\\"
+  namedParentByParentId: NamedParent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateNamedParentById\` mutation.\\"\\"\\"
+input UpdateNamedParentByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`NamedParent\` being updated.
+  \\"\\"\\"
+  namedParentPatch: NamedParentPatch!
+}
+
+\\"\\"\\"All input for the \`updateNamedParent\` mutation.\\"\\"\\"
+input UpdateNamedParentInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`NamedParent\` being updated.
+  \\"\\"\\"
+  namedParentPatch: NamedParentPatch!
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`NamedParent\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+}
+
+\\"\\"\\"The output of our update \`NamedParent\` mutation.\\"\\"\\"
+type UpdateNamedParentPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`NamedParent\` that was updated by this mutation.\\"\\"\\"
+  namedParent: NamedParent
+
+  \\"\\"\\"An edge for our \`NamedParent\`. May be used by Relay 1.\\"\\"\\"
+  namedParentEdge(
+    \\"\\"\\"The method to use when ordering \`NamedParent\`.\\"\\"\\"
+    orderBy: [NamedParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): NamedParentsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateParentById\` mutation.\\"\\"\\"
+input UpdateParentByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: Int!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Parent\` being updated.
+  \\"\\"\\"
+  parentPatch: ParentPatch!
+}
+
+\\"\\"\\"All input for the \`updateParent\` mutation.\\"\\"\\"
+input UpdateParentInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`Parent\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`Parent\` being updated.
+  \\"\\"\\"
+  parentPatch: ParentPatch!
+}
+
+\\"\\"\\"The output of our update \`Parent\` mutation.\\"\\"\\"
+type UpdateParentPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`Parent\` that was updated by this mutation.\\"\\"\\"
+  parent: Parent
+
+  \\"\\"\\"An edge for our \`Parent\`. May be used by Relay 1.\\"\\"\\"
+  parentEdge(
+    \\"\\"\\"The method to use when ordering \`Parent\`.\\"\\"\\"
+    orderBy: [ParentsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ParentsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"All input for the \`updateParentUuidById\` mutation.\\"\\"\\"
+input UpdateParentUuidByIdInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+  id: UUID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`ParentUuid\` being updated.
+  \\"\\"\\"
+  parentUuidPatch: ParentUuidPatch!
+}
+
+\\"\\"\\"All input for the \`updateParentUuid\` mutation.\\"\\"\\"
+input UpdateParentUuidInput {
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"
+  The globally unique \`ID\` which will identify a single \`ParentUuid\` to be updated.
+  \\"\\"\\"
+  nodeId: ID!
+
+  \\"\\"\\"
+  An object where the defined keys will be set on the \`ParentUuid\` being updated.
+  \\"\\"\\"
+  parentUuidPatch: ParentUuidPatch!
+}
+
+\\"\\"\\"The output of our update \`ParentUuid\` mutation.\\"\\"\\"
+type UpdateParentUuidPayload {
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"The \`ParentUuid\` that was updated by this mutation.\\"\\"\\"
+  parentUuid: ParentUuid
+
+  \\"\\"\\"An edge for our \`ParentUuid\`. May be used by Relay 1.\\"\\"\\"
+  parentUuidEdge(
+    \\"\\"\\"The method to use when ordering \`ParentUuid\`.\\"\\"\\"
+    orderBy: [ParentUuidsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): ParentUuidsEdge
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
+}
+
+\\"\\"\\"
+A universally unique identifier as defined by [RFC 4122](https://tools.ietf.org/html/rfc4122).
+\\"\\"\\"
+scalar UUID
+"
+`;

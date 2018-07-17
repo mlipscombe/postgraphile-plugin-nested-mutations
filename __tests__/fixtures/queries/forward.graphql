@@ -1,0 +1,58 @@
+mutation {
+  # Create multiple children.
+  f1: createParent(
+    input: {
+      parent: {
+        name: "test f1"
+        childrenUsingId: {
+          create: [{
+            name: "child 1 of test f1"
+          }, {
+            name: "child 2 of test f1"
+          }]
+        }
+      }
+    }
+  ) {
+    ...parentInfo
+  }
+
+  # Create no children.
+  f2: createParent(
+    input: {
+      parent: {
+        name: "test f2"
+      }
+    }
+  ) {
+    ...parentInfo
+  }
+
+  # Connect existing children, not currently supported.
+  # f3: createParent(
+  #  input: {
+  #    parent: {
+  #      name: "test f3"
+  #      children: {
+  #        connect: [100]
+  #      }
+  #    }
+  #  }
+  #) {
+  #  ...parentInfo
+  #}
+}
+
+fragment parentInfo on CreateParentPayload {
+  parent {
+    id
+    name
+    childrenByParentId {
+      nodes {
+        id
+        parentId
+        name
+      }
+    }
+  }
+}
