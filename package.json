@@ -1,6 +1,6 @@
 {
     "name": "postgraphile-plugin-nested-mutations",
-    "version": "1.0.0-alpha.6",
+    "version": "1.0.0-alpha.7",
     "description": "Nested mutations plugin for PostGraphile",
     "main": "index.js",
     "repository": {
@@ -13,22 +13,25 @@
       "url": "https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues"
     },
     "scripts": {
-      "test": "jest"
+      "test": "scripts/test"
     },
     "dependencies": {
-        "graphile-build-pg": "^4.0.0-rc.3"
+        "graphile-build-pg": "^4.0.0-rc.4"
     },
     "peerDependencies": {
-        "postgraphile": "^4.0.0-rc.1.4"
+        "postgraphile": "^4.0.0-rc.2"
     },
     "devDependencies": {
         "graphql": ">=0.9 <0.14",
         "jest": "^20.0.4",
         "pg": ">=6.1.0 <8",
         "eslint": "^4.19.1",
-        "postgraphile-core": "^4.0.0-rc.1.4",
+        "postgraphile-core": "^4.0.0-rc.4",
         "eslint-config-airbnb-base": "^12.1.0",
         "eslint-plugin-import": "^2.12.0"
+    },
+    "jest": {
+      "testRegex": "__tests__/.*\\.test\\.js$"
     },
     "files": [
         "src"
@@ -46,7 +49,8 @@
         "jest": true
       },
       "globals": {
-        "expect": false
+        "expect": false,
+        "jasmine": false
       },
       "rules": {
         "import/no-unresolved": 0,
