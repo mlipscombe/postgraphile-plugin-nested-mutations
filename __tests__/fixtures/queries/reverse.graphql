@@ -33,7 +33,7 @@ mutation {
         name: "test r3"
         parentToParentId: {
           connect: {
-            id: 1000
+            parentId: 1000
           }
         }
       }
@@ -48,7 +48,7 @@ fragment childInfo on CreateChildPayload {
     id
     name
     parentByParentId {
-      id
+      parentId
       name
     }
   }

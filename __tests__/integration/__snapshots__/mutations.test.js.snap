@@ -19,8 +19,8 @@ Object {
             },
           ],
         },
-        "id": 1,
         "name": "test f1",
+        "parentId": 1,
       },
     },
     "f2": Object {
@@ -28,8 +28,8 @@ Object {
         "childrenByParentId": Object {
           "nodes": Array [],
         },
-        "id": 3,
         "name": "test f2",
+        "parentId": 3,
       },
     },
   },
@@ -142,8 +142,8 @@ Object {
         "id": 3,
         "name": "test r1",
         "parentByParentId": Object {
-          "id": 2,
           "name": "parent of child r1",
+          "parentId": 2,
         },
       },
     },
@@ -159,8 +159,8 @@ Object {
         "id": 5,
         "name": "test r3",
         "parentByParentId": Object {
-          "id": 1000,
           "name": "A",
+          "parentId": 1000,
         },
       },
     },

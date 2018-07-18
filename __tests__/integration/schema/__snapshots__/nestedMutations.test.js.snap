@@ -37,6 +37,109 @@ input ChildInput {
   parentToParentId: ChildParentFkeyInput
 }
 
+type ChildNoPk {
+  name: String!
+
+  \\"\\"\\"Reads a single \`Parent\` that is related to this \`ChildNoPk\`.\\"\\"\\"
+  parentByParentId: Parent
+  parentId: Int
+}
+
+\\"\\"\\"
+A condition to be used against \`ChildNoPk\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+\\"\\"\\"
+input ChildNoPkCondition {
+  \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
+  name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`parentId\` field.\\"\\"\\"
+  parentId: Int
+}
+
+\\"\\"\\"An input for mutations affecting \`ChildNoPk\`\\"\\"\\"
+input ChildNoPkInput {
+  name: String!
+  parentId: Int
+  parentToParentId: ChildNoPkParentFkeyInput
+}
+
+\\"\\"\\"The \`childNoPk\` to be created by this mutation.\\"\\"\\"
+input ChildNoPkParentFkeyChildNoPkCreateInput {
+  name: String!
+  parentToParentId: ChildNoPkParentFkeyInput
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`parent\` in the \`ChildNoPkInput\` mutation.
+\\"\\"\\"
+input ChildNoPkParentFkeyInput {
+  \\"\\"\\"The primary key(s) for \`parent\` for the far side of the relationship.\\"\\"\\"
+  connect: ChildNoPkParentFkeyParentConnectInput
+
+  \\"\\"\\"
+  A \`ParentInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: ChildNoPkParentFkeyParentCreateInput
+}
+
+\\"\\"\\"
+Input for the nested mutation of \`childNoPk\` in the \`ParentInput\` mutation.
+\\"\\"\\"
+input ChildNoPkParentFkeyInverseInput {
+  \\"\\"\\"
+  A \`ChildNoPkInput\` object that will be created and connected to this object.
+  \\"\\"\\"
+  create: [ChildNoPkParentFkeyChildNoPkCreateInput!]
+}
+
+\\"\\"\\"The fields on \`parent\` to look up the row to connect.\\"\\"\\"
+input ChildNoPkParentFkeyParentConnectInput {
+  parentId: Int
+}
+
+\\"\\"\\"The \`parent\` to be created by this mutation.\\"\\"\\"
+input ChildNoPkParentFkeyParentCreateInput {
+  childNoPksUsingParentId: ChildNoPkParentFkeyInverseInput
+  childrenUsingParentId: ChildParentFkeyInverseInput
+  name: String!
+}
+
+\\"\\"\\"A connection to a list of \`ChildNoPk\` values.\\"\\"\\"
+type ChildNoPksConnection {
+  \\"\\"\\"
+  A list of edges which contains the \`ChildNoPk\` and cursor to aid in pagination.
+  \\"\\"\\"
+  edges: [ChildNoPksEdge!]!
+
+  \\"\\"\\"A list of \`ChildNoPk\` objects.\\"\\"\\"
+  nodes: [ChildNoPk]!
+
+  \\"\\"\\"Information to aid in pagination.\\"\\"\\"
+  pageInfo: PageInfo!
+
+  \\"\\"\\"The count of *all* \`ChildNoPk\` you could get from the connection.\\"\\"\\"
+  totalCount: Int
+}
+
+\\"\\"\\"A \`ChildNoPk\` edge in the connection.\\"\\"\\"
+type ChildNoPksEdge {
+  \\"\\"\\"A cursor for use in pagination.\\"\\"\\"
+  cursor: Cursor
+
+  \\"\\"\\"The \`ChildNoPk\` at the end of the edge.\\"\\"\\"
+  node: ChildNoPk
+}
+
+\\"\\"\\"Methods to use when ordering \`ChildNoPk\`.\\"\\"\\"
+enum ChildNoPksOrderBy {
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+}
+
 \\"\\"\\"The fields on \`child\` to look up the row to connect.\\"\\"\\"
 input ChildParentFkeyChildConnectInput {
   id: Int
@@ -77,13 +180,13 @@ input ChildParentFkeyInverseInput {
 
 \\"\\"\\"The fields on \`parent\` to look up the row to connect.\\"\\"\\"
 input ChildParentFkeyParentConnectInput {
-  id: Int
+  parentId: Int
 }
 
 \\"\\"\\"The \`parent\` to be created by this mutation.\\"\\"\\"
 input ChildParentFkeyParentCreateInput {
-  childrenUsingId: ChildParentFkeyInverseInput
-  id: Int
+  childNoPksUsingParentId: ChildNoPkParentFkeyInverseInput
+  childrenUsingParentId: ChildParentFkeyInverseInput
   name: String!
 }
 
@@ -284,6 +387,44 @@ input CreateChildInput {
   payload verbatim. May be used to track mutations by the client.
   \\"\\"\\"
   clientMutationId: String
+}
+
+\\"\\"\\"All input for the create \`ChildNoPk\` mutation.\\"\\"\\"
+input CreateChildNoPkInput {
+  \\"\\"\\"The \`ChildNoPk\` to be created by this mutation.\\"\\"\\"
+  childNoPk: ChildNoPkInput!
+
+  \\"\\"\\"
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  \\"\\"\\"
+  clientMutationId: String
+}
+
+\\"\\"\\"The output of our create \`ChildNoPk\` mutation.\\"\\"\\"
+type CreateChildNoPkPayload {
+  \\"\\"\\"The \`ChildNoPk\` that was created by this mutation.\\"\\"\\"
+  childNoPk: ChildNoPk
+
+  \\"\\"\\"An edge for our \`ChildNoPk\`. May be used by Relay 1.\\"\\"\\"
+  childNoPkEdge(
+    \\"\\"\\"The method to use when ordering \`ChildNoPk\`.\\"\\"\\"
+    orderBy: [ChildNoPksOrderBy!] = [NATURAL]
+  ): ChildNoPksEdge
+
+  \\"\\"\\"
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  \\"\\"\\"
+  clientMutationId: String
+
+  \\"\\"\\"Reads a single \`Parent\` that is related to this \`ChildNoPk\`.\\"\\"\\"
+  parentByParentId: Parent
+
+  \\"\\"\\"
+  Our root query field type. Allows us to run any query from our mutation payload.
+  \\"\\"\\"
+  query: Query
 }
 
 \\"\\"\\"The output of our create \`Child\` mutation.\\"\\"\\"
@@ -1047,14 +1188,14 @@ type DeleteNamedParentPayload {
   query: Query
 }
 
-\\"\\"\\"All input for the \`deleteParentById\` mutation.\\"\\"\\"
-input DeleteParentByIdInput {
+\\"\\"\\"All input for the \`deleteParentByParentId\` mutation.\\"\\"\\"
+input DeleteParentByParentIdInput {
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   \\"\\"\\"
   clientMutationId: String
-  id: Int!
+  parentId: Int!
 }
 
 \\"\\"\\"All input for the \`deleteParent\` mutation.\\"\\"\\"
@@ -1217,6 +1358,8 @@ input Issue1ChildParentIdFkeyInverseInput {
 \\"\\"\\"The fields on \`issue1Child\` to look up the row to connect.\\"\\"\\"
 input Issue1ChildParentIdFkeyIssue1ChildConnectInput {
   name: String!
+  parentId: UUID
+  serviceId: String!
   val: String!
 }
 
@@ -1648,6 +1791,14 @@ type Mutation {
     input: CreateChildInput!
   ): CreateChildPayload
 
+  \\"\\"\\"Creates a single \`ChildNoPk\`.\\"\\"\\"
+  createChildNoPk(
+    \\"\\"\\"
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    \\"\\"\\"
+    input: CreateChildNoPkInput!
+  ): CreateChildNoPkPayload
+
   \\"\\"\\"Creates a single \`ChildUuid\`.\\"\\"\\"
   createChildUuid(
     \\"\\"\\"
@@ -1857,11 +2008,11 @@ type Mutation {
   ): DeleteParentPayload
 
   \\"\\"\\"Deletes a single \`Parent\` using a unique key.\\"\\"\\"
-  deleteParentById(
+  deleteParentByParentId(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     \\"\\"\\"
-    input: DeleteParentByIdInput!
+    input: DeleteParentByParentIdInput!
   ): DeleteParentPayload
 
   \\"\\"\\"Deletes a single \`ParentUuid\` using its globally unique id.\\"\\"\\"
@@ -2031,11 +2182,11 @@ type Mutation {
   ): UpdateParentPayload
 
   \\"\\"\\"Updates a single \`Parent\` using a unique key and a patch.\\"\\"\\"
-  updateParentById(
+  updateParentByParentId(
     \\"\\"\\"
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
     \\"\\"\\"
-    input: UpdateParentByIdInput!
+    input: UpdateParentByParentIdInput!
   ): UpdateParentPayload
 
   \\"\\"\\"
@@ -2269,6 +2420,35 @@ type PageInfo {
 }
 
 type Parent implements Node {
+  \\"\\"\\"Reads and enables pagination through a set of \`ChildNoPk\`.\\"\\"\\"
+  childNoPksByParentId(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ChildNoPkCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`ChildNoPk\`.\\"\\"\\"
+    orderBy: [ChildNoPksOrderBy!] = [NATURAL]
+  ): ChildNoPksConnection!
+
   \\"\\"\\"Reads and enables pagination through a set of \`Child\`.\\"\\"\\"
   childrenByParentId(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -2297,13 +2477,13 @@ type Parent implements Node {
     \\"\\"\\"The method to use when ordering \`Child\`.\\"\\"\\"
     orderBy: [ChildrenOrderBy!] = [PRIMARY_KEY_ASC]
   ): ChildrenConnection!
-  id: Int!
   name: String!
 
   \\"\\"\\"
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   \\"\\"\\"
   nodeId: ID!
+  parentId: Int!
 }
 
 \\"\\"\\"
@@ -2364,26 +2544,27 @@ input ParentChildRelationNamedParentCreateInput {
 A condition to be used against \`Parent\` object types. All fields are tested for equality and combined with a logical ‘and.’
 \\"\\"\\"
 input ParentCondition {
-  \\"\\"\\"Checks for equality with the object’s \`id\` field.\\"\\"\\"
-  id: Int
-
   \\"\\"\\"Checks for equality with the object’s \`name\` field.\\"\\"\\"
   name: String
+
+  \\"\\"\\"Checks for equality with the object’s \`parentId\` field.\\"\\"\\"
+  parentId: Int
 }
 
 \\"\\"\\"An input for mutations affecting \`Parent\`\\"\\"\\"
 input ParentInput {
-  childrenUsingId: ChildParentFkeyInverseInput
-  id: Int
+  childNoPksUsingParentId: ChildNoPkParentFkeyInverseInput
+  childrenUsingParentId: ChildParentFkeyInverseInput
   name: String!
+  parentId: Int
 }
 
 \\"\\"\\"
 Represents an update to a \`Parent\`. Fields that are set will be updated.
 \\"\\"\\"
 input ParentPatch {
-  id: Int
   name: String
+  parentId: Int
 }
 
 \\"\\"\\"A connection to a list of \`Parent\` values.\\"\\"\\"
@@ -2414,11 +2595,11 @@ type ParentsEdge {
 
 \\"\\"\\"Methods to use when ordering \`Parent\`.\\"\\"\\"
 enum ParentsOrderBy {
-  ID_ASC
-  ID_DESC
   NAME_ASC
   NAME_DESC
   NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
 }
@@ -2527,6 +2708,35 @@ enum ParentUuidsOrderBy {
 
 \\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
+  \\"\\"\\"Reads and enables pagination through a set of \`ChildNoPk\`.\\"\\"\\"
+  allChildNoPks(
+    \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
+    after: Cursor
+
+    \\"\\"\\"Read all values in the set before (above) this cursor.\\"\\"\\"
+    before: Cursor
+
+    \\"\\"\\"
+    A condition to be used in determining which values should be returned by the collection.
+    \\"\\"\\"
+    condition: ChildNoPkCondition
+
+    \\"\\"\\"Only read the first \`n\` values of the set.\\"\\"\\"
+    first: Int
+
+    \\"\\"\\"Only read the last \`n\` values of the set.\\"\\"\\"
+    last: Int
+
+    \\"\\"\\"
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    \\"\\"\\"
+    offset: Int
+
+    \\"\\"\\"The method to use when ordering \`ChildNoPk\`.\\"\\"\\"
+    orderBy: [ChildNoPksOrderBy!] = [NATURAL]
+  ): ChildNoPksConnection
+
   \\"\\"\\"Reads and enables pagination through a set of \`ChildUuid\`.\\"\\"\\"
   allChildUuids(
     \\"\\"\\"Read all values in the set after (below) this cursor.\\"\\"\\"
@@ -2903,7 +3113,7 @@ type Query implements Node {
     \\"\\"\\"The globally unique \`ID\` to be used in selecting a single \`Parent\`.\\"\\"\\"
     nodeId: ID!
   ): Parent
-  parentById(id: Int!): Parent
+  parentByParentId(parentId: Int!): Parent
 
   \\"\\"\\"Reads a single \`ParentUuid\` using its globally unique \`ID\`.\\"\\"\\"
   parentUuid(
@@ -3398,14 +3608,14 @@ type UpdateNamedParentPayload {
   query: Query
 }
 
-\\"\\"\\"All input for the \`updateParentById\` mutation.\\"\\"\\"
-input UpdateParentByIdInput {
+\\"\\"\\"All input for the \`updateParentByParentId\` mutation.\\"\\"\\"
+input UpdateParentByParentIdInput {
   \\"\\"\\"
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   \\"\\"\\"
   clientMutationId: String
-  id: Int!
+  parentId: Int!
 
   \\"\\"\\"
   An object where the defined keys will be set on the \`Parent\` being updated.

@@ -1,4 +1,4 @@
-insert into p.parent (id, name) values
+insert into p.parent (parent_id, name) values
     (1000, 'A'),
     (1001, 'B'),
     (1002, 'C');

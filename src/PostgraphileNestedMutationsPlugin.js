@@ -121,13 +121,6 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       }));
     }
 
-    const primaryKeyConstraint = introspectionResultsByKind.constraint
-      .filter(con => con.type === 'p')
-      .find(con => con.classId === table.id);
-    const primaryKeyFields = introspectionResultsByKind.attribute
-      .filter(attr => attr.classId === table.id)
-      .filter(attr => primaryKeyConstraint.keyAttributeNums.includes(attr.num));
-
     const recurseForwardNestedMutations = async (inputType, data, { input }, { pgClient }, resolveInfo) => {
       const nestedFields = pgNestedPluginForwardInputTypes[inputType.name];
       const output = Object.assign({}, input);
@@ -290,6 +283,13 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           }
         }));
 
+        const primaryKeyConstraint = introspectionResultsByKind.constraint
+          .filter(con => con.type === 'p')
+          .find(con => con.classId === table.id);
+        const primaryKeyFields = introspectionResultsByKind.attribute
+          .filter(attr => attr.classId === table.id)
+          .filter(attr => primaryKeyConstraint.keyAttributeNums.includes(attr.num));
+
         const where = [];
         primaryKeyFields.forEach((f) => {
           where.push(sql.fragment`
@@ -404,9 +404,9 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         ? constraint.foreignKeyAttributeNums.map(num => foreignAttributes.filter(attr => attr.num === num)[0])
         : constraint.foreignKeyAttributeNums.map(num => attributes.filter(attr => attr.num === num)[0]);
 
-      if (omit(foreignTable, 'read')) {
-        return;
-      }
+      const foreignPrimaryKeyConstraint = introspectionResultsByKind.constraint
+        .filter(con => con.type === 'p')
+        .find(con => con.classId === foreignTable.id);
 
       if (!keys.every(_ => _) || !foreignKeys.every(_ => _)) {
         throw new Error('Could not find key columns!');
@@ -414,7 +414,8 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       if (
         omit(foreignTable, 'read') ||
         keys.some(key => omit(key, 'read')) ||
-        foreignKeys.some(key => omit(key, 'read'))
+        foreignKeys.some(key => omit(key, 'read')) ||
+        (!foreignPrimaryKeyConstraint && omit(foreignTable, 'create'))
       ) {
         return;
       }
@@ -442,13 +443,6 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         isForward,
       });
 
-      const primaryKeyConstraint = introspectionResultsByKind.constraint
-        .filter(con => con.type === 'p')
-        .find(con => con.classId === foreignTable.id);
-      const primaryKeyFields = introspectionResultsByKind.attribute
-        .filter(attr => attr.classId === foreignTable.id)
-        .filter(attr => primaryKeyConstraint.keyAttributeNums.includes(attr.num));
-
       const connectInputType = newWithHooks(
         GraphQLInputObjectType,
         {
@@ -458,8 +452,12 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
             const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
             const inputFields = gqlForeignTableType._fields;
 
+            const primaryKeyFields = introspectionResultsByKind.attribute
+              .filter(attr => attr.classId === foreignTable.id)
+              .filter(attr => foreignPrimaryKeyConstraint.keyAttributeNums.includes(attr.num));
+
             return Object.keys(inputFields)
-              .filter(key => primaryKeyFields.map(pkf => pkf.name).includes(key))
+              .filter(key => primaryKeyFields.map(pkf => inflection.column(pkf)).includes(key))
               .map(k => Object.assign({}, { [k]: inputFields[k] }))
               .reduce((res, o) => Object.assign(res, o), {});
           },
@@ -511,12 +509,15 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           description: `Input for the nested mutation of \`${foreignTableName}\` in the \`${tableTypeName}\` mutation.`,
           fields: () => {
             const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
-            const operations = {
-              connect: {
+            const operations = {};
+            if (foreignPrimaryKeyConstraint) {
+              operations.connect = {
                 description: `The primary key(s) for \`${foreignTableName}\` for the far side of the relationship.`,
                 type: isForward ? connectInputType : new GraphQLList(new GraphQLNonNull(connectInputType)),
-              },
-            };
+              };
+            } else {
+              debug(`Could not determine primary keys for table with id ${isForward ? constraint.foreignClassId : constraint.classId}`);
+            }
             if (!omit(foreignTable, 'create')) {
               if (gqlForeignTableType) {
                 operations.create = {

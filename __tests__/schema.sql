@@ -4,7 +4,7 @@ drop schema if exists p cascade;
 create schema p;
 
 create table p.parent (
-  id serial primary key,
+  parent_id serial primary key,
   name text not null
 );
 
@@ -13,7 +13,14 @@ create table p.child (
   parent_id integer,
   name text not null,
   constraint child_parent_fkey foreign key (parent_id)
-    references p.parent (id)
+    references p.parent (parent_id)
+);
+
+create table p.child_no_pk (
+  parent_id integer,
+  name text not null,
+  constraint child_no_pk_parent_fkey foreign key (parent_id)
+    references p.parent (parent_id)
 );
 
 create table p.parent_uuid (
@@ -73,3 +80,4 @@ create table p.issue_1_child (
   primary key (parent_id, service_id, name, val),
   foreign key (parent_id) references p.issue_1_parent (id)
 );
+

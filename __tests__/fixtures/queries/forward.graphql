@@ -4,7 +4,7 @@ mutation {
     input: {
       parent: {
         name: "test f1"
-        childrenUsingId: {
+        childrenUsingParentId: {
           create: [{
             name: "child 1 of test f1"
           }, {
@@ -45,7 +45,7 @@ mutation {
 
 fragment parentInfo on CreateParentPayload {
   parent {
-    id
+    parentId
     name
     childrenByParentId {
       nodes {
