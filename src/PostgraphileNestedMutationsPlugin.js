@@ -407,15 +407,23 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       const foreignPrimaryKeyConstraint = introspectionResultsByKind.constraint
         .filter(con => con.type === 'p')
         .find(con => con.classId === foreignTable.id);
+      const foreignPrimaryKeyFields = foreignPrimaryKeyConstraint
+        ? introspectionResultsByKind.attribute
+          .filter(attr => attr.classId === foreignTable.id)
+          .filter(attr => foreignPrimaryKeyConstraint.keyAttributeNums.includes(attr.num))
+        : null;
+
+      const connectable = foreignPrimaryKeyConstraint && !foreignPrimaryKeyFields.some(key => omit(key, 'read'));
+      const creatable = !omit(foreignTable, 'create');
 
       if (!keys.every(_ => _) || !foreignKeys.every(_ => _)) {
         throw new Error('Could not find key columns!');
       }
       if (
+        (!connectable && !creatable) ||
         omit(foreignTable, 'read') ||
         keys.some(key => omit(key, 'read')) ||
-        foreignKeys.some(key => omit(key, 'read')) ||
-        (!foreignPrimaryKeyConstraint && omit(foreignTable, 'create'))
+        foreignKeys.some(key => omit(key, 'read'))
       ) {
         return;
       }
@@ -443,58 +451,6 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         isForward,
       });
 
-      const connectInputType = newWithHooks(
-        GraphQLInputObjectType,
-        {
-          name: connectInputTypeName,
-          description: `The fields on \`${foreignTableName}\` to look up the row to connect.`,
-          fields: () => {
-            const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
-            const inputFields = gqlForeignTableType._fields;
-
-            const primaryKeyFields = introspectionResultsByKind.attribute
-              .filter(attr => attr.classId === foreignTable.id)
-              .filter(attr => foreignPrimaryKeyConstraint.keyAttributeNums.includes(attr.num));
-
-            return Object.keys(inputFields)
-              .filter(key => primaryKeyFields.map(pkf => inflection.column(pkf)).includes(key))
-              .map(k => Object.assign({}, { [k]: inputFields[k] }))
-              .reduce((res, o) => Object.assign(res, o), {});
-          },
-        },
-        {
-          isNestedMutationInputType: true,
-          isNestedMutationConnectInputType: true,
-          isNestedInverseMutation: !isForward,
-          pgInflection: table,
-          pgNestedForeignInflection: foreignTable,
-        },
-      );
-
-      const createInputType = newWithHooks(
-        GraphQLInputObjectType,
-        {
-          name: createInputTypeName,
-          description: `The \`${foreignTableName}\` to be created by this mutation.`,
-          fields: () => {
-            const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
-            const inputFields = gqlForeignTableType._fields;
-            const omittedFields = keys.map(k => inflection.column(k));
-            return Object.keys(inputFields)
-              .filter(key => !omittedFields.includes(key))
-              .map(k => Object.assign({}, { [k]: inputFields[k] }))
-              .reduce((res, o) => Object.assign(res, o), {});
-          },
-        },
-        {
-          isNestedMutationInputType: true,
-          isNestedMutationCreateInputType: true,
-          isNestedInverseMutation: !isForward,
-          pgInflection: table,
-          pgNestedForeignInflection: foreignTable,
-        },
-      );
-
       const connectorTypeName = pgNestedConnectorTypeName({
         constraint,
         table,
@@ -510,7 +466,30 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           fields: () => {
             const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
             const operations = {};
-            if (foreignPrimaryKeyConstraint) {
+            if (connectable) {
+              const connectInputType = newWithHooks(
+                GraphQLInputObjectType,
+                {
+                  name: connectInputTypeName,
+                  description: `The fields on \`${foreignTableName}\` to look up the row to connect.`,
+                  fields: () => foreignPrimaryKeyFields
+                    .map(k => Object.assign({}, {
+                      [inflection.column(k)]: {
+                        description: k.description,
+                        type: new GraphQLNonNull(getGqlInputTypeByTypeIdAndModifier(k.typeId, k.typeModifier)),
+                      },
+                    }))
+                    .reduce((res, o) => Object.assign(res, o), {}),
+                },
+                {
+                  isNestedMutationInputType: true,
+                  isNestedMutationConnectInputType: true,
+                  isNestedInverseMutation: !isForward,
+                  pgInflection: table,
+                  pgNestedForeignInflection: foreignTable,
+                },
+              );
+
               operations.connect = {
                 description: `The primary key(s) for \`${foreignTableName}\` for the far side of the relationship.`,
                 type: isForward ? connectInputType : new GraphQLList(new GraphQLNonNull(connectInputType)),
@@ -518,15 +497,34 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
             } else {
               debug(`Could not determine primary keys for table with id ${isForward ? constraint.foreignClassId : constraint.classId}`);
             }
-            if (!omit(foreignTable, 'create')) {
-              if (gqlForeignTableType) {
-                operations.create = {
-                  description: `A \`${gqlForeignTableType.name}\` object that will be created and connected to this object.`,
-                  type: isForward ? createInputType : new GraphQLList(new GraphQLNonNull(createInputType)),
-                };
-              } else {
-                debug(`Could not determine type for foreign table with id ${isForward ? constraint.foreignClassId : constraint.classId}`);
-              }
+            if (creatable) {
+              const createInputType = newWithHooks(
+                GraphQLInputObjectType,
+                {
+                  name: createInputTypeName,
+                  description: `The \`${foreignTableName}\` to be created by this mutation.`,
+                  fields: () => {
+                    const inputFields = gqlForeignTableType._fields;
+                    const omittedFields = keys.map(k => inflection.column(k));
+                    return Object.keys(inputFields)
+                      .filter(key => !omittedFields.includes(key))
+                      .map(k => Object.assign({}, { [k]: inputFields[k] }))
+                      .reduce((res, o) => Object.assign(res, o), {});
+                  },
+                },
+                {
+                  isNestedMutationInputType: true,
+                  isNestedMutationCreateInputType: true,
+                  isNestedInverseMutation: !isForward,
+                  pgInflection: table,
+                  pgNestedForeignInflection: foreignTable,
+                },
+              );
+
+              operations.create = {
+                description: `A \`${gqlForeignTableType.name}\` object that will be created and connected to this object.`,
+                type: isForward ? createInputType : new GraphQLList(new GraphQLNonNull(createInputType)),
+              };
             }
             return operations;
           },
@@ -558,8 +556,6 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
 
         pgNestedPluginForwardInputTypes[gqlType.name].push({
           name: fieldName,
-          connectInputType,
-          createInputType,
           constraint,
           table,
           foreignTable,
@@ -569,8 +565,6 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       } else {
         pgNestedPluginReverseInputTypes[gqlType.name].push({
           name: fieldName,
-          connectInputType,
-          createInputType,
           constraint,
           table,
           foreignTable,

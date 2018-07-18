@@ -95,7 +95,7 @@ input ChildNoPkParentFkeyInverseInput {
 
 \\"\\"\\"The fields on \`parent\` to look up the row to connect.\\"\\"\\"
 input ChildNoPkParentFkeyParentConnectInput {
-  parentId: Int
+  parentId: Int!
 }
 
 \\"\\"\\"The \`parent\` to be created by this mutation.\\"\\"\\"
@@ -142,7 +142,7 @@ enum ChildNoPksOrderBy {
 
 \\"\\"\\"The fields on \`child\` to look up the row to connect.\\"\\"\\"
 input ChildParentFkeyChildConnectInput {
-  id: Int
+  id: Int!
 }
 
 \\"\\"\\"The \`child\` to be created by this mutation.\\"\\"\\"
@@ -180,7 +180,7 @@ input ChildParentFkeyInverseInput {
 
 \\"\\"\\"The fields on \`parent\` to look up the row to connect.\\"\\"\\"
 input ChildParentFkeyParentConnectInput {
-  parentId: Int
+  parentId: Int!
 }
 
 \\"\\"\\"The \`parent\` to be created by this mutation.\\"\\"\\"
@@ -277,7 +277,7 @@ input ChildUuidInput {
 
 \\"\\"\\"The fields on \`childUuid\` to look up the row to connect.\\"\\"\\"
 input ChildUuidParentUuidFkeyChildUuidConnectInput {
-  id: UUID
+  id: UUID!
 }
 
 \\"\\"\\"The \`childUuid\` to be created by this mutation.\\"\\"\\"
@@ -319,7 +319,7 @@ input ChildUuidParentUuidFkeyInverseInput {
 
 \\"\\"\\"The fields on \`parentUuid\` to look up the row to connect.\\"\\"\\"
 input ChildUuidParentUuidFkeyParentUuidConnectInput {
-  id: UUID
+  id: UUID!
 }
 
 \\"\\"\\"The \`parentUuid\` to be created by this mutation.\\"\\"\\"
@@ -1358,7 +1358,7 @@ input Issue1ChildParentIdFkeyInverseInput {
 \\"\\"\\"The fields on \`issue1Child\` to look up the row to connect.\\"\\"\\"
 input Issue1ChildParentIdFkeyIssue1ChildConnectInput {
   name: String!
-  parentId: UUID
+  parentId: UUID!
   serviceId: String!
   val: String!
 }
@@ -1373,7 +1373,7 @@ input Issue1ChildParentIdFkeyIssue1ChildCreateInput {
 
 \\"\\"\\"The fields on \`issue1Parent\` to look up the row to connect.\\"\\"\\"
 input Issue1ChildParentIdFkeyIssue1ParentConnectInput {
-  id: UUID
+  id: UUID!
 }
 
 \\"\\"\\"The \`issue1Parent\` to be created by this mutation.\\"\\"\\"
@@ -1602,7 +1602,7 @@ input MultiChildMultiParentFkeyInverseInput {
 
 \\"\\"\\"The fields on \`multiChild\` to look up the row to connect.\\"\\"\\"
 input MultiChildMultiParentFkeyMultiChildConnectInput {
-  id: Int
+  id: Int!
 }
 
 \\"\\"\\"The \`multiChild\` to be created by this mutation.\\"\\"\\"
@@ -1614,7 +1614,7 @@ input MultiChildMultiParentFkeyMultiChildCreateInput {
 
 \\"\\"\\"The fields on \`multiParent\` to look up the row to connect.\\"\\"\\"
 input MultiChildMultiParentFkeyMultiParentConnectInput {
-  id: Int
+  id: Int!
   name: String!
 }
 
@@ -2518,7 +2518,7 @@ input ParentChildRelationInverseInput {
 
 \\"\\"\\"The fields on \`namedChild\` to look up the row to connect.\\"\\"\\"
 input ParentChildRelationNamedChildConnectInput {
-  id: Int
+  id: Int!
 }
 
 \\"\\"\\"The \`namedChild\` to be created by this mutation.\\"\\"\\"
@@ -2530,7 +2530,7 @@ input ParentChildRelationNamedChildCreateInput {
 
 \\"\\"\\"The fields on \`namedParent\` to look up the row to connect.\\"\\"\\"
 input ParentChildRelationNamedParentConnectInput {
-  id: Int
+  id: Int!
 }
 
 \\"\\"\\"The \`namedParent\` to be created by this mutation.\\"\\"\\"
