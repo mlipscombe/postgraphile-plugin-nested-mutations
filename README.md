@@ -5,7 +5,26 @@
 This plugin implements nested mutations based on both forward and reverse foreign
 key relationships in PostGraphile v4.  Nested mutations can be of infinite depth.
 
-## Breaking Changes
+## Changes
+
+### v1.0.0-alpha.11
+
+ * *BREAKING* The `connect` field has been removed.  In its place is `connectByNode`
+   which takes a nodeId, and `connnectBy<PK Fields>` for the table's primary key and
+   each unique key.
+ * Nested mutations on update mutations are now supported.
+ * Existing rows can be now be `connected`.
+ * Multiple actions per nested type may now be specified (i.e. create some records
+   and connect others).
+ * A new field has been added on nested mutations: `deleteOthers`.  When set to `true`,
+   any related rows not updated or created in the nested mutation will be deleted.  To
+   keep a row that is not being created or updated, specify it for update with no 
+   modified fields.
+ * Relationships between two tables that have multiple relationships are now supported.
+   Previously, the last constraint would overwrite the others.  These will usually end 
+   up with some pretty awkward names, so the use of smart comments to name the relationships
+   is recommended.
+ * Improved test suite.
 
 ### v1.0.0-alpha.7
 
@@ -15,10 +34,7 @@ field.  See the examples below for the new GraphQL schema that is generated.
 
 ## Warning
 This is *alpha quality* software.  It has not undergone significant testing and 
-the following features are not yet implemented:
-
- * `connect` on reverse relationships (i.e. updating an existing row to connect to a new one);
- * nested mutations on any mutations other than `create` mutations.
+it might eat all your data.
 
 ## Getting Started
 
@@ -51,12 +67,81 @@ app.use(
 app.listen(5000);
 ```
 
-## Example Usage
+### Plugin Options
+
+When using PostGraphile as a library, the following plugin options can be passed 
+via `graphileBuildOptions`:
+
+<details>
+
+<summary>nestedMutationsSimpleFieldNames</summary>
+
+Use simple field names for nested mutations.  Instead of names suffixed with
+`tableBy<Key>` and `tableUsing<Key>`, tables with a single foreign key relationship 
+between them will have their nested relation fields named `table`.  Defaults to
+`false`.
+
+```js
+postgraphile(pgConfig, schema, {
+  graphileBuildOptions: {
+    nestedMutationsSimpleFieldNames: true,
+  }
+});
+```
+</details>
+
+<details>
+
+<summary>nestedMutationsDeleteOthers</summary>
+
+Controls whether the `deleteOthers` field is available on nested mutations.  Defaults
+to `true`.
+
+```js
+postgraphile(pgConfig, schema, {
+  graphileBuildOptions: {
+    nestedMutationsDeleteOthers: false,
+  }
+});
+```
+</details>
+
+<summary>nestedMutationsOldUniqueFields</summary>
+
+If enabled, plural names for one-to-one relations will be used.  For backwards
+compatibility.  Defaults to `false`.
+
+```js
+postgraphile(pgConfig, schema, {
+  graphileBuildOptions: {
+    nestedMutationsOldUniqueFields: false,
+  }
+});
+
+</details>
+
+## Usage
 
 This plugin creates an additional field on each GraphQL `Input` type for every forward
 and reverse foreign key relationship on a table, with the same name as the foreign table.
 
-``` sql
+Each nested mutation field will have the following fields. They will accept an array if
+the relationship is a one-to-many relationship, or a single input if they are one-to-one.
+
+### Connect to Existing Record
+#### `connectByNodeId`
+Connect using a `nodeId` from the nested table.
+
+### `connectBy<K>`
+Connect using any readable primary key or unique constraint on the nested table.
+
+### Creating New Records
+### `create`
+Create a new record in the nested table.
+
+## Example
+
+```sql
 create table parent (
   id serial primary key,
   name text not null
@@ -71,53 +156,6 @@ create table child (
 );
 ```
 
-This schema will result in a GraphQL input type that looks like this:
-
-``` graphql
-input ParentInput {
-  id: Int
-  name: String!
-  childrenUsingId: ChildParentFkeyInverseInput
-}
-
-input ChildInput {
-  id: Int
-  name: String!
-  parentId: Int
-  parentToParentId: ChildParentFkeyInput
-}
-
-input ChildParentFkeyInput {
-  connect: ChildParentFkeyParentConnectInput
-  create: ChildParentFkeyParentCreateInput
-}
-
-input ChildParentFkeyParentConnectInput {
-  id: Int
-}
-
-input ChildParentFkeyParentCreateInput {
-  id: Int
-  name: String!
-  childrenUsingId: ChildParentFkeyInverseInput
-}
-
-input ChildParentFkeyInverseInput {
-  connect: [ChildParentFkeyChildConnectInput!]
-  create: [ChildParentFkeyChildCreateInput!]
-}
-
-input ChildParentFkeyChildConnectInput {
-  id: Int
-}
-
-input ChildParentFkeyChildCreateInput {
-  id: Int
-  name: String!
-  parentToParentId: ChildParentFkeyInput
-}
-```
-
 A nested mutation against this schema, using `Parent` as the base mutation
 would look like this:
 
@@ -127,6 +165,9 @@ mutation {
     parent: {
       name: "Parent 1"
       childrenUsingId: {
+        connectById: [{
+          id: 1
+        }]
         create: [{
           name: "Child 1"
         }, {

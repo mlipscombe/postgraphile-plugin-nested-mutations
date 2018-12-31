@@ -2,6 +2,7 @@
 const pg = require('pg');
 const { readFile } = require('fs');
 const pgConnectionString = require('pg-connection-string');
+const { createPostGraphileSchema } = require('postgraphile-core');
 
 // This test suite can be flaky. Increase it’s timeout.
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
@@ -14,6 +15,8 @@ function readFilePromise(filename, encoding) {
     });
   });
 }
+
+const kitchenSinkData = () => readFilePromise(`${__dirname}/data.sql`, 'utf8');
 
 const withPgClient = async (url, fn) => {
   if (!fn) {
@@ -39,15 +42,14 @@ const withPgClient = async (url, fn) => {
   }
 };
 
-const withDbFromUrl = async (url, fn) =>
-  withPgClient(url, async (client) => {
-    try {
-      await client.query('BEGIN ISOLATION LEVEL SERIALIZABLE;');
-      return fn(client);
-    } finally {
-      await client.query('COMMIT;');
-    }
-  });
+const withDbFromUrl = async (url, fn) => withPgClient(url, async (client) => {
+  try {
+    await client.query('BEGIN ISOLATION LEVEL SERIALIZABLE;');
+    return fn(client);
+  } finally {
+    await client.query('COMMIT;');
+  }
+});
 
 
 const withRootDb = fn => withDbFromUrl(process.env.TEST_DATABASE_URL, fn);
@@ -118,6 +120,38 @@ withPrepopulatedDb.teardown = () => {
   prepopulatedDBKeepalive = null;
 };
 
+const withSchema = ({
+  setup,
+  test,
+  options = {},
+}) => () => withPgClient(async (client) => {
+  if (setup) {
+    if (typeof setup === 'function') {
+      await setup(client);
+    } else {
+      await client.query(setup);
+    }
+  }
+
+  const schemaOptions = Object.assign(
+    {
+      appendPlugins: [require('../index.js')],
+      showErrorStack: true,
+    },
+    options,
+  );
+
+  const schema = await createPostGraphileSchema(client, ['p'], schemaOptions);
+  return test({
+    schema,
+    pgClient: client,
+  });
+});
+
+const loadQuery = fn => readFilePromise(`${__dirname}/fixtures/queries/${fn}`, 'utf8');
+
 exports.withRootDb = withRootDb;
 exports.withPrepopulatedDb = withPrepopulatedDb;
 exports.withPgClient = withPgClient;
+exports.withSchema = withSchema;
+exports.loadQuery = loadQuery;
