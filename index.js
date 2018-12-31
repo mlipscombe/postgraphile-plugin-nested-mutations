@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 module.exports = function PostgraphileNestedMutationsPlugin(builder, options) {
   require('./src/PostgraphileNestedConnectorsPlugin.js')(builder, options);
   require('./src/PostgraphileNestedTypesPlugin')(builder, options);
