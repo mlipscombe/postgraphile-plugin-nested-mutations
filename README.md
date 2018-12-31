@@ -93,6 +93,7 @@ postgraphile(pgConfig, schema, {
     nestedMutationsOldUniqueFields: false,
   }
 });
+```
 
 </details>
 
