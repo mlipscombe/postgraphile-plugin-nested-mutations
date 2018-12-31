@@ -109,11 +109,11 @@ the relationship is a one-to-many relationship, or a single input if they are on
 #### `connectByNodeId`
 Connect using a `nodeId` from the nested table.
 
-### `connectBy<K>`
+#### `connectBy<K>`
 Connect using any readable primary key or unique constraint on the nested table.
 
 ### Creating New Records
-### `create`
+#### `create`
 Create a new record in the nested table.
 
 ## Example
