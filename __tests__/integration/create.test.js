@@ -63,6 +63,91 @@ test(
 );
 
 test(
+  'forward nested mutation creates records',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+      
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      create table p.grandchild (
+        id serial primary key,
+        child_id integer not null,
+        name text not null,
+        constraint grandchild_child_fkey foreign key (child_id)
+          references p.child (id)
+      );
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          createParent(
+            input: {
+              parent: {
+                name: "test f1"
+                childrenUsingId: {
+                  create: [{
+                    name: "child 1 of test f1"
+                    grandchildrenUsingId: {
+                      create: [{
+                        name: "grandchild 1 of child 1"
+                      }]
+                    }
+                  }, {
+                    name: "child 2 of test f1"
+                    grandchildrenUsingId: {
+                      create: [{
+                        name: "grandchild 1 of child 2"
+                      }]
+                    }
+                  }]
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                  grandchildrenByChildId {
+                    nodes {
+                      id
+                      childId
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const data = result.data.createParent.parent;
+      expect(data.childrenByParentId.nodes).toHaveLength(2);
+      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+    },
+  }),
+);
+
+test(
   'forward nested mutation connects existing records and creates simultaneously',
   withSchema({
     setup: `
