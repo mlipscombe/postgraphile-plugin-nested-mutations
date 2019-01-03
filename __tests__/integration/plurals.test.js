@@ -125,3 +125,133 @@ test(
     },
   }),
 );
+
+// https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/7
+test(
+  '1:1 relationship does not allow multiple nested rows',
+  withSchema({
+    setup: `
+      CREATE TABLE p.post (
+        id SERIAL PRIMARY KEY,
+        text TEXT NOT NULL
+      );
+      
+      CREATE TABLE p.post_image (
+        id SERIAL PRIMARY KEY,
+        post_id INTEGER UNIQUE NOT NULL REFERENCES p.post(id) ON DELETE CASCADE,
+        url TEXT NOT NULL
+      );
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          c1: createPost(
+            input: {
+              post: {
+                text: "test"
+                postImageUsingId: {
+                  create: {
+                    url: "test child"
+                  }
+                }
+              }
+            }
+          ) {
+            post {
+              id
+            }
+          }
+
+          c2: createPostImage(
+            input: {
+              postImage: {
+                url: "child"
+                postToPostId: {
+                  create: {
+                    text: "child's parent"
+                  }
+                }
+              }
+            }
+          ) {
+            postImage {
+              postId
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+    },
+  }),
+);
+
+test(
+  '1:1 relationship mutation fails when multiple operators are specified',
+  withSchema({
+    setup: `
+      CREATE TABLE p.post (
+        id SERIAL PRIMARY KEY,
+        text TEXT NOT NULL
+      );
+      
+      CREATE TABLE p.post_image (
+        id SERIAL PRIMARY KEY,
+        post_id INTEGER UNIQUE NOT NULL REFERENCES p.post(id) ON DELETE CASCADE,
+        url TEXT NOT NULL
+      );
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          c1: createPost(
+            input: {
+              post: {
+                text: "test"
+                postImageUsingId: {
+                  create: {
+                    url: "test child"
+                  }
+                  connectById: {
+                    id: 1
+                  }
+                }
+              }
+            }
+          ) {
+            post {
+              id
+            }
+          }
+
+          c2: createPostImage(
+            input: {
+              postImage: {
+                url: "child"
+                postToPostId: {
+                  create: {
+                    text: "child's parent"
+                  }
+                  connectById: {
+                    id: 1
+                  }
+                }
+              }
+            }
+          ) {
+            postImage {
+              postId
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).toHaveProperty('errors');
+      expect(result.errors[0].message).toMatch(/may only create or connect a single row/);
+    },
+  }),
+);

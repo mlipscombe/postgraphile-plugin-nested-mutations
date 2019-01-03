@@ -377,7 +377,6 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         const row = rows[0];
 
         await Promise.all(Object.keys(inputData).map(async (key) => {
-          const modifiedRows = [];
           const nestedField = pgNestedPluginReverseInputTypes[table.id]
             .find(obj => obj.name === key);
           if (!nestedField) {
@@ -388,13 +387,19 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
             foreignTable,
             keys, // nested table's keys
             foreignKeys, // main mutation table's keys
+            isUnique,
           } = nestedField;
+          const modifiedRows = [];
 
           const ForeignTableType = pgGetGqlTypeByTypeIdAndModifier(foreignTable.type.id, null);
           const foreignTableConnectorFields = pgNestedTableConnectors[foreignTable.id];
           const fieldValue = inputData[key];
           const { primaryKeyConstraint } = foreignTable;
           const primaryKeys = primaryKeyConstraint ? primaryKeyConstraint.keyAttributes : null;
+
+          if (isUnique && Object.keys(fieldValue).length > 1) {
+            throw new Error('Unique relations may only create or connect a single row.');
+          }
 
           await Promise.all(foreignTableConnectorFields.map(async ({
             fieldName: connectorFieldName,
@@ -404,10 +409,14 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
             if (!(connectorFieldName in fieldValue)) {
               return;
             }
+            const connectorField = Array.isArray(fieldValue[connectorFieldName])
+              ? fieldValue[connectorFieldName]
+              : [fieldValue[connectorFieldName]];
+
             let where = '';
 
             if (isNodeIdConnector) {
-              const nodes = fieldValue[connectorFieldName].map((k) => {
+              const nodes = connectorField.map((k) => {
                 const nodeId = k[nodeIdFieldName];
                 const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
                 if (Type !== ForeignTableType) {
@@ -440,7 +449,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
               where = sql.fragment`(${sql.join(
                 foreignPrimaryKeys.map(
                   k => sql.fragment`${sql.join(
-                    fieldValue[connectorFieldName].map(
+                    connectorField.map(
                       col => sql.fragment`
                         ${sql.identifier(k.name)} = ${gql2pg(
                           col[inflection.column(k)],

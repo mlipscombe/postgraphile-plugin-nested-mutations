@@ -1,5 +1,10 @@
 # Changes
 
+## v1.0.0-alpha.13
+
+  * 1:1 relationships no longer allow a list of objects, or allow multiple
+    operations, preventing a constraint violation.
+
 ## v1.0.0-alpha.11
 
  * *BREAKING* One-to-one relationships are now correctly named in the singular.  To

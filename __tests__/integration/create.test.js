@@ -63,7 +63,7 @@ test(
 );
 
 test(
-  'forward nested mutation creates records',
+  'forward deeply nested mutation creates records',
   withSchema({
     setup: `
       create table p.parent (

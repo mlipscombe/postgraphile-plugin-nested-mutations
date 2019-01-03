@@ -151,8 +151,6 @@ module.exports = function PostGraphileNestedTypesPlugin(
     pgNestedPluginForwardInputTypes[table.id] = [];
     pgNestedPluginReverseInputTypes[table.id] = [];
 
-    const nestedFields = {};
-
     foreignKeyConstraints.forEach((constraint) => {
       const isForward = constraint.classId === table.id;
       const foreignTable = isForward
@@ -183,6 +181,13 @@ module.exports = function PostGraphileNestedTypesPlugin(
       ) {
         return;
       }
+
+      const keys = constraint.keyAttributes;
+      const isUnique = !!foreignTable.constraints.find(
+        c => (c.type === 'p' || c.type === 'u')
+          && c.keyAttributeNums.length === keys.length
+          && c.keyAttributeNums.every((n, i) => keys[i].num === n),
+      );
 
       const fieldName = pgNestedFieldName({
         constraint,
@@ -223,7 +228,9 @@ module.exports = function PostGraphileNestedTypesPlugin(
             pgNestedTableConnectors[foreignTable.id].forEach(({ field, fieldName: connectorFieldName }) => {
               operations[connectorFieldName] = {
                 description: `The primary key(s) for \`${foreignTableName}\` for the far side of the relationship.`,
-                type: isForward ? field : new GraphQLList(new GraphQLNonNull(field)),
+                type: isForward
+                  ? field
+                  : (isUnique ? field : new GraphQLList(new GraphQLNonNull(field))),
               };
             });
             if (creatable) {
@@ -275,6 +282,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
           keys: constraint.keyAttributes,
           foreignKeys: constraint.foreignKeyAttributes,
           connectorInputField,
+          isUnique,
         });
       } else {
         pgNestedPluginReverseInputTypes[table.id].push({
@@ -285,10 +293,11 @@ module.exports = function PostGraphileNestedTypesPlugin(
           keys: constraint.keyAttributes,
           foreignKeys: constraint.foreignKeyAttributes,
           connectorInputField,
+          isUnique,
         });
       }
     });
 
-    return Object.assign({}, fields, nestedFields);
+    return fields;
   });
 };
