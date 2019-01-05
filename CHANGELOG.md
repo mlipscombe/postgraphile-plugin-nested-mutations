@@ -1,5 +1,9 @@
 # Changes
 
+## v1.0.0-alpha.14
+
+  * Support for updating nested records.
+
 ## v1.0.0-alpha.13
 
   * 1:1 relationships no longer allow a list of objects, or allow multiple
