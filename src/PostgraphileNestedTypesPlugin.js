@@ -6,40 +6,44 @@ module.exports = function PostGraphileNestedTypesPlugin(
     nestedMutationsOldUniqueFields = false,
   } = {},
 ) {
+  builder.hook('inflection', (inflection, build) => build.extend(inflection, {
+    nestedConnectorType(options) {
+      const {
+        constraint: {
+          name,
+          tags: {
+            name: tagName,
+          },
+        },
+        isForward,
+      } = options;
+      return inflection.upperCamelCase(`${tagName || name}_${isForward ? '' : 'Inverse'}_input`);
+    },
+    nestedCreateInputType(options) {
+      const {
+        constraint: {
+          name,
+          tags: {
+            name: tagName,
+          },
+        },
+        foreignTable,
+      } = options;
+      return inflection.upperCamelCase(`${tagName || name}_${foreignTable.name}_create_input`);
+    },
+  }));
+
   builder.hook('build', (build) => {
     const {
-      inflection,
+      extend,
       pgOmit: omit,
+      inflection,
     } = build;
 
-    return build.extend(build, {
+    return extend(build, {
       pgNestedPluginForwardInputTypes: {},
       pgNestedPluginReverseInputTypes: {},
       pgNestedResolvers: {},
-      pgNestedConnectorTypeName(options) {
-        const {
-          constraint: {
-            name,
-            tags: {
-              name: tagName,
-            },
-          },
-          isForward,
-        } = options;
-        return inflection.upperCamelCase(`${tagName || name}_${isForward ? '' : 'Inverse'}_input`);
-      },
-      pgNestedCreateInputTypeName(options) {
-        const {
-          constraint: {
-            name,
-            tags: {
-              name: tagName,
-            },
-          },
-          foreignTable,
-        } = options;
-        return inflection.upperCamelCase(`${tagName || name}_${foreignTable.name}_create_input`);
-      },
       pgNestedFieldName(options) {
         const {
           constraint: {
@@ -111,10 +115,9 @@ module.exports = function PostGraphileNestedTypesPlugin(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgNestedPluginForwardInputTypes,
       pgNestedPluginReverseInputTypes,
-      pgNestedConnectorTypeName,
-      pgNestedCreateInputTypeName,
-      pgNestedFieldName,
       pgNestedTableConnectors,
+      pgNestedTableUpdaters,
+      pgNestedFieldName,
       graphql: {
         GraphQLInputObjectType,
         GraphQLList,
@@ -172,9 +175,11 @@ module.exports = function PostGraphileNestedTypesPlugin(
       const creatable = !omit(foreignTable, 'create')
         && !omit(constraint, 'create')
         && !constraint.keyAttributes.some(key => omit(key, 'create'));
+      const updateable = !omit(foreignTable, 'update')
+        && !omit(constraint, 'update');
 
       if (
-        (!connectable && !creatable)
+        (!connectable && !creatable && !updateable)
         || omit(foreignTable, 'read')
         // || primaryKey.keyAttributes.some(key => omit(key, 'read'))
         // || foreignPrimaryKey.keyAttributes.some(key => omit(key, 'read'))
@@ -196,14 +201,14 @@ module.exports = function PostGraphileNestedTypesPlugin(
         isForward,
       });
 
-      const createInputTypeName = pgNestedCreateInputTypeName({
+      const createInputTypeName = inflection.nestedCreateInputType({
         constraint,
         table,
         foreignTable,
         isForward,
       });
 
-      const connectorTypeName = pgNestedConnectorTypeName({
+      const connectorTypeName = inflection.nestedConnectorType({
         constraint,
         table,
         foreignTable,
@@ -228,6 +233,14 @@ module.exports = function PostGraphileNestedTypesPlugin(
             pgNestedTableConnectors[foreignTable.id].forEach(({ field, fieldName: connectorFieldName }) => {
               operations[connectorFieldName] = {
                 description: `The primary key(s) for \`${foreignTableName}\` for the far side of the relationship.`,
+                type: isForward
+                  ? field
+                  : (isUnique ? field : new GraphQLList(new GraphQLNonNull(field))),
+              };
+            });
+            pgNestedTableUpdaters[foreignTable.id].forEach(({ field, fieldName: updaterFieldName }) => {
+              operations[updaterFieldName] = {
+                description: `The primary key(s) and patch data for \`${foreignTableName}\` for the far side of the relationship.`,
                 type: isForward
                   ? field
                   : (isUnique ? field : new GraphQLList(new GraphQLNonNull(field))),

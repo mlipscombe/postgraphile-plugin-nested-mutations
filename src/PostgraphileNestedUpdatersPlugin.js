@@ -1,26 +1,26 @@
-module.exports = function PostGraphileNestedConnectorsPlugin(
+module.exports = function PostGraphileNestedUpdatersPlugin(
   builder,
 ) {
   builder.hook('inflection', (inflection, build) => build.extend(inflection, {
-    nestedConnectByNodeIdField() {
-      return this.camelCase(`connect_by_${build.nodeIdFieldName}`);
+    nestedUpdateByNodeIdField() {
+      return this.camelCase(`update_by_${build.nodeIdFieldName}`);
     },
-    nestedConnectByKeyField(options) {
+    nestedUpdateByKeyField(options) {
       const {
         constraint,
       } = options;
-      return this.camelCase(`connect_by_${constraint.keyAttributes.map(k => k.name).join('_and_')}`);
+      return this.camelCase(`update_by_${constraint.keyAttributes.map(k => k.name).join('_and_')}`);
     },
-    nestedConnectByNodeIdInputType(options) {
+    nestedUpdateByNodeIdInputType(options) {
       const {
         table,
       } = options;
 
       const tableFieldName = inflection.tableFieldName(table);
 
-      return this.upperCamelCase(`${tableFieldName}_node_id_connect`);
+      return this.upperCamelCase(`${tableFieldName}_node_id_update`);
     },
-    nestedConnectByKeyInputType(options) {
+    nestedUpdateByKeyInputType(options) {
       const {
         table,
         constraint: {
@@ -33,12 +33,12 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
 
       const tableFieldName = this.tableFieldName(table);
 
-      return this.upperCamelCase(`${tableFieldName}_${tagName || name}_connect`);
+      return this.upperCamelCase(`${tableFieldName}_${tagName || name}_update`);
     },
   }));
 
   builder.hook('build', build => build.extend(build, {
-    pgNestedTableConnectors: {},
+    pgNestedTableUpdaters: {},
   }));
 
   builder.hook('GraphQLObjectType:fields', (fields, build, context) => {
@@ -47,10 +47,12 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
       newWithHooks,
       describePgEntity,
       nodeIdFieldName,
+      getTypeByName,
       pgIntrospectionResultsByKind: introspectionResultsByKind,
-      pgGetGqlInputTypeByTypeIdAndModifier: getGqlInputTypeByTypeIdAndModifier,
+      pgGetGqlInputTypeByTypeIdAndModifier,
+      pgGetGqlTypeByTypeIdAndModifier,
       pgOmit: omit,
-      pgNestedTableConnectors,
+      pgNestedTableUpdaters,
       graphql: {
         GraphQLNonNull,
         GraphQLInputObjectType,
@@ -68,9 +70,17 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
     introspectionResultsByKind.class
       .filter(cls => cls.namespace && cls.isSelectable)
       .forEach((table) => {
+        const TableType = pgGetGqlTypeByTypeIdAndModifier(
+          table.type.id,
+          null,
+        );
         const tableFieldName = inflection.tableFieldName(table);
+        const patchFieldName = inflection.patchField(tableFieldName);
+        const TablePatch = getTypeByName(
+          inflection.patchType(TableType.name),
+        );
 
-        pgNestedTableConnectors[table.id] = table.constraints
+        pgNestedTableUpdaters[table.id] = table.constraints
           .filter(con => con.type === 'u' || con.type === 'p')
           .filter(con => !omit(con))
           .filter(con => !con.keyAttributes.some(key => omit(key, 'read')))
@@ -89,25 +99,34 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
             return {
               constraint,
               keys: constraint.keyAttributes,
-              isNodeIdConnector: false,
-              fieldName: inflection.nestedConnectByKeyField({ table, constraint }),
+              isNodeIdUpdater: false,
+              fieldName: inflection.nestedUpdateByKeyField({ table, constraint }),
               field: newWithHooks(
                 GraphQLInputObjectType,
                 {
-                  name: inflection.nestedConnectByKeyInputType({ table, constraint }),
-                  description: `The fields on \`${tableFieldName}\` to look up the row to connect.`,
-                  fields: () => keys
-                    .map(k => Object.assign({}, {
-                      [inflection.column(k)]: {
-                        description: k.description,
-                        type: new GraphQLNonNull(getGqlInputTypeByTypeIdAndModifier(k.typeId, k.typeModifier)),
+                  name: inflection.nestedUpdateByKeyInputType({ table, constraint }),
+                  description: `The fields on \`${tableFieldName}\` to look up the row to update.`,
+                  fields: () => Object.assign(
+                    {},
+                    {
+                      [patchFieldName]: {
+                        description: `An object where the defined keys will be set on the \`${tableFieldName}\` being updated.`,
+                        type: new GraphQLNonNull(TablePatch),
                       },
-                    }))
-                    .reduce((res, o) => Object.assign(res, o), {}),
+                    },
+                    keys
+                      .map(k => Object.assign({}, {
+                        [inflection.column(k)]: {
+                          description: k.description,
+                          type: new GraphQLNonNull(pgGetGqlInputTypeByTypeIdAndModifier(k.typeId, k.typeModifier)),
+                        },
+                      }))
+                      .reduce((res, o) => Object.assign(res, o), {}),
+                  ),
                 },
                 {
                   isNestedMutationInputType: true,
-                  isNestedMutationConnectInputType: true,
+                  isNestedMutationUpdateInputType: true,
                   pgInflection: table,
                   pgFieldInflection: constraint,
                 },
@@ -117,33 +136,38 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
 
         const { primaryKeyConstraint } = table;
         if (nodeIdFieldName && primaryKeyConstraint) {
-          pgNestedTableConnectors[table.id].push({
+          pgNestedTableUpdaters[table.id].push({
             constraint: null,
             keys: null,
-            isNodeIdConnector: true,
-            fieldName: inflection.nestedConnectByNodeIdField(),
+            isNodeIdUpdater: true,
+            fieldName: inflection.nestedUpdateByNodeIdField(),
             field: newWithHooks(
               GraphQLInputObjectType,
               {
-                name: inflection.nestedConnectByNodeIdInputType({ table }),
-                description: 'The globally unique `ID` look up for the row to connect.',
+                name: inflection.nestedUpdateByNodeIdInputType({ table }),
+                description: 'The globally unique `ID` look up for the row to update.',
                 fields: {
                   [nodeIdFieldName]: {
                     description: `The globally unique \`ID\` which identifies a single \`${tableFieldName}\` to be connected.`,
                     type: new GraphQLNonNull(GraphQLID),
                   },
+                  [patchFieldName]: {
+                    description: `An object where the defined keys will be set on the \`${tableFieldName}\` being updated.`,
+                    type: new GraphQLNonNull(TablePatch),
+                  },
                 },
               },
               {
                 isNestedMutationInputType: true,
-                isNestedMutationConnectInputType: true,
-                isNestedMutationConnectByNodeIdType: true,
+                isNestedMutationUpdateInputType: true,
+                isNestedMutationUpdateByNodeIdType: true,
                 pgInflection: table,
               },
             ),
           });
         }
       });
+
     return fields;
   });
 };

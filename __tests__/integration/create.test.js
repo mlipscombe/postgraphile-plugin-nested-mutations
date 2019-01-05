@@ -3,6 +3,39 @@ const { graphql } = require('graphql');
 const { withSchema } = require('../helpers');
 
 test(
+  'table with no relations is not affected by plugin',
+  withSchema({
+    setup: `
+    create table p.parent (
+      id serial primary key,
+      name text not null
+    );`,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          createParent(
+            input: {
+              parent: {
+                name: "test f1"
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+    },
+  }),
+);
+
+test(
   'forward nested mutation creates records',
   withSchema({
     setup: `
