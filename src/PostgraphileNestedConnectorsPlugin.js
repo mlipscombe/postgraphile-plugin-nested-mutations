@@ -1,49 +1,51 @@
 module.exports = function PostGraphileNestedConnectorsPlugin(
   builder,
 ) {
-  builder.hook('build', (build) => {
-    const {
-      nodeIdFieldName,
-      inflection,
-    } = build;
+  builder.hook('inflection', (inflection, build) => build.extend(inflection, {
+    nestedConnectByNodeIdField() {
+      return this.camelCase(`connect_by_${build.nodeIdFieldName}`);
+    },
+    nestedConnectByKeyField(options) {
+      const {
+        constraint,
+      } = options;
+      return this.camelCase(`connect_by_${constraint.keyAttributes.map(k => k.name).join('_and_')}`);
+    },
+    nestedUpdateByKeyField(options) {
+      const {
+        constraint,
+      } = options;
+      return this.camelCase(`update_by_${constraint.keyAttributes.map(k => k.name).join('_and_')}`);
+    },
+    nestedConnectByNodeIdInputType(options) {
+      const {
+        table,
+      } = options;
 
-    return build.extend(build, {
-      pgNestedTableConnectors: {},
-      pgNestedConnectByNodeIdFieldName() {
-        return inflection.camelCase(`connect_by_${nodeIdFieldName}`);
-      },
-      pgNestedConnectByKeyFieldName(options) {
-        const {
-          constraint,
-        } = options;
-        return inflection.camelCase(`connect_by_${constraint.keyAttributes.map(k => k.name).join('_and_')}`);
-      },
-      pgNestedConnectByNodeIdInputTypeName(options) {
-        const {
-          table,
-        } = options;
+      const tableFieldName = inflection.tableFieldName(table);
 
-        const tableFieldName = inflection.tableFieldName(table);
-
-        return inflection.upperCamelCase(`${tableFieldName}_node_id_connect`);
-      },
-      pgNestedConnectByKeyInputTypeName(options) {
-        const {
-          table,
-          constraint: {
-            name,
-            tags: {
-              name: tagName,
-            },
+      return this.upperCamelCase(`${tableFieldName}_node_id_connect`);
+    },
+    nestedConnectByKeyInputType(options) {
+      const {
+        table,
+        constraint: {
+          name,
+          tags: {
+            name: tagName,
           },
-        } = options;
+        },
+      } = options;
 
-        const tableFieldName = inflection.tableFieldName(table);
+      const tableFieldName = this.tableFieldName(table);
 
-        return inflection.upperCamelCase(`${tableFieldName}_${tagName || name}_connect`);
-      },
-    });
-  });
+      return this.upperCamelCase(`${tableFieldName}_${tagName || name}_connect`);
+    },
+  }));
+
+  builder.hook('build', build => build.extend(build, {
+    pgNestedTableConnectors: {},
+  }));
 
   builder.hook('GraphQLObjectType:fields', (fields, build, context) => {
     const {
@@ -55,10 +57,6 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
       pgGetGqlInputTypeByTypeIdAndModifier: getGqlInputTypeByTypeIdAndModifier,
       pgOmit: omit,
       pgNestedTableConnectors,
-      pgNestedConnectByNodeIdFieldName,
-      pgNestedConnectByKeyFieldName,
-      pgNestedConnectByNodeIdInputTypeName,
-      pgNestedConnectByKeyInputTypeName,
       graphql: {
         GraphQLNonNull,
         GraphQLInputObjectType,
@@ -84,7 +82,7 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
           .filter(con => !con.keyAttributes.some(key => omit(key, 'read')))
           .map((constraint) => {
             const keys = constraint.keyAttributes;
-            const connectInputTypeName = pgNestedConnectByKeyInputTypeName({ table, constraint });
+            const connectInputTypeName = inflection.nestedConnectByKeyInputType({ table, constraint });
 
             // istanbul ignore next
             if (!keys.every(_ => _)) {
@@ -99,7 +97,7 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
               constraint,
               keys: constraint.keyAttributes,
               isNodeIdConnector: false,
-              fieldName: pgNestedConnectByKeyFieldName({ table, constraint }),
+              fieldName: inflection.nestedConnectByKeyField({ table, constraint }),
               field: newWithHooks(
                 GraphQLInputObjectType,
                 {
@@ -126,12 +124,12 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
 
         const { primaryKeyConstraint } = table;
         if (nodeIdFieldName && primaryKeyConstraint) {
-          const connectInputTypeName = pgNestedConnectByNodeIdInputTypeName({ table });
+          const connectInputTypeName = inflection.nestedConnectByNodeIdInputType({ table });
           pgNestedTableConnectors[table.id].push({
             constraint: null,
             keys: null,
             isNodeIdConnector: true,
-            fieldName: pgNestedConnectByNodeIdFieldName(),
+            fieldName: inflection.nestedConnectByNodeIdField(),
             field: newWithHooks(
               GraphQLInputObjectType,
               {
