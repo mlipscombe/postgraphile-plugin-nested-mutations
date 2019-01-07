@@ -73,8 +73,10 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       pgNestedPluginForwardInputTypes,
       pgNestedPluginReverseInputTypes,
       pgNestedResolvers,
-      pgNestedTableConnectors,
-      pgNestedTableUpdaters,
+      pgNestedTableConnectorFields,
+      pgNestedTableConnect,
+      pgNestedTableUpdaterFields,
+      pgNestedTableUpdate,
       pgViaTemporaryTable: viaTemporaryTable,
       pgGetGqlTypeByTypeIdAndModifier,
     } = build;
@@ -122,167 +124,57 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       const output = Object.assign({}, input);
       await Promise.all(nestedFields
         .filter(k => Object.prototype.hasOwnProperty.call(input, k.name))
-        .map(async (f) => {
+        .map(async (nestedField) => {
           const {
             foreignTable,
             keys,
             foreignKeys,
             name: fieldName,
-          } = f;
+          } = nestedField;
           const fieldValue = input[fieldName];
-          const ForeignTableType = pgGetGqlTypeByTypeIdAndModifier(foreignTable.type.id, null);
 
-          const foreignTableConnectorFields = pgNestedTableConnectors[foreignTable.id];
-          await Promise.all(foreignTableConnectorFields.map(async ({
-            fieldName: connectorFieldName,
-            isNodeIdConnector,
-            constraint,
-          }) => {
-            if (!(connectorFieldName in fieldValue)) {
-              return;
-            }
+          await Promise.all(
+            pgNestedTableConnectorFields[foreignTable.id]
+              .filter(f => f.fieldName in fieldValue)
+              .map(async (connectorField) => {
+                const row = await pgNestedTableConnect({
+                  nestedField,
+                  connectorField,
+                  input: fieldValue[connectorField.fieldName],
+                  pgClient,
+                });
 
-            let where = '';
+                if (!row) {
+                  throw new Error('invalid connect keys');
+                }
 
-            if (isNodeIdConnector) {
-              const nodeId = fieldValue[connectorFieldName][nodeIdFieldName];
-              const primaryKeys = foreignTable.primaryKeyConstraint.keyAttributes;
-              const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
-              if (Type !== ForeignTableType) {
-                throw new Error('Mismatched type');
-              }
-              if (identifiers.length !== primaryKeys.length) {
-                throw new Error('Invalid ID');
-              }
-              where = sql.fragment`${sql.join(
-                primaryKeys.map(
-                  (key, idx) => sql.fragment`${sql.identifier(
-                    key.name,
-                  )} = ${gql2pg(
-                    identifiers[idx],
-                    key.type,
-                    key.typeModifier,
-                  )}`,
-                ),
-                ') and (',
-              )}`;
-            } else {
-              const foreignPrimaryKeys = constraint.keyAttributes;
-              where = sql.fragment`${sql.join(
-                foreignPrimaryKeys.map(
-                  k => sql.fragment`
-                    ${sql.identifier(k.name)} = ${gql2pg(
-                      fieldValue[connectorFieldName][inflection.column(k)],
-                      k.type,
-                      k.typeModifier,
-                    )}
-                  `,
-                ),
-                ') and (',
-              )}`;
-            }
-            const select = foreignKeys.map(k => sql.identifier(k.name));
-            const connectQuery = sql.query`
-              select ${sql.join(select, ', ')}
-              from ${sql.identifier(foreignTable.namespace.name, foreignTable.name)}
-              where ${where}
-            `;
-            const { text, values } = sql.compile(connectQuery);
-            const { rows: connectedRows } = await pgClient.query(text, values);
-            const connectedRow = connectedRows[0];
-            foreignKeys.forEach((k, idx) => {
-              output[inflection.column(keys[idx])] = connectedRow[k.name];
-            });
-          }));
+                foreignKeys.forEach((k, idx) => {
+                  output[inflection.column(keys[idx])] = row[k.name];
+                });
+              }),
+          );
 
-          const foreignTableUpdaterFields = pgNestedTableUpdaters[foreignTable.id];
-          await Promise.all(foreignTableUpdaterFields.map(async ({
-            fieldName: updaterFieldName,
-            isNodeIdUpdater,
-            constraint,
-          }) => {
-            if (!(updaterFieldName in fieldValue)) {
-              return;
-            }
+          await Promise.all(
+            pgNestedTableUpdaterFields[foreignTable.id]
+              .filter(f => f.fieldName in fieldValue)
+              .map(async (connectorField) => {
+                const row = await pgNestedTableUpdate({
+                  nestedField,
+                  connectorField,
+                  input: fieldValue[connectorField.fieldName],
+                  pgClient,
+                  context,
+                });
 
-            let keyWhere = '';
+                if (!row) {
+                  throw new Error('unmatched row for update');
+                }
 
-            if (isNodeIdUpdater) {
-              const nodeId = fieldValue[updaterFieldName][nodeIdFieldName];
-              const primaryKeys = foreignTable.primaryKeyConstraint.keyAttributes;
-              const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
-              if (Type !== ForeignTableType) {
-                throw new Error('Mismatched type');
-              }
-              if (identifiers.length !== primaryKeys.length) {
-                throw new Error('Invalid ID');
-              }
-              keyWhere = sql.fragment`${sql.join(
-                primaryKeys.map(
-                  (key, idx) => sql.fragment`${sql.identifier(
-                    key.name,
-                  )} = ${gql2pg(
-                    identifiers[idx],
-                    key.type,
-                    key.typeModifier,
-                  )}`,
-                ),
-                ') and (',
-              )}`;
-            } else {
-              const foreignPrimaryKeys = constraint.keyAttributes;
-              keyWhere = sql.fragment`${sql.join(
-                foreignPrimaryKeys.map(
-                  k => sql.fragment`
-                    ${sql.identifier(k.name)} = ${gql2pg(
-                      fieldValue[updaterFieldName][inflection.column(k)],
-                      k.type,
-                      k.typeModifier,
-                    )}
-                  `,
-                ),
-                ') and (',
-              )}`;
-            }
-            const updateInput = fieldValue[updaterFieldName][
-              inflection.patchField(inflection.tableFieldName(foreignTable))
-            ];
-            const sqlColumns = [];
-            const sqlValues = [];
-            foreignTable.attributes.forEach((attr) => {
-              if (!pgColumnFilter(attr, build, context)) return;
-              if (omit(attr, 'update')) return;
-
-              const colFieldName = inflection.column(attr);
-              if (colFieldName in updateInput) {
-                const val = updateInput[colFieldName];
-                sqlColumns.push(sql.identifier(attr.name));
-                sqlValues.push(gql2pg(val, attr.type, attr.typeModifier));
-              }
-            });
-            if (sqlColumns.length === 0) {
-              return;
-            }
-            const updateQuery = sql.query`
-              update ${sql.identifier(
-                foreignTable.namespace.name,
-                foreignTable.name,
-              )} set ${sql.join(
-                sqlColumns.map(
-                  (col, i) => sql.fragment`${col} = ${sqlValues[i]}`,
-                ),
-                ', ',
-              )}
-              where ${keyWhere}
-              returning *`;
-
-            const { text, values } = sql.compile(updateQuery);
-            const { rows: updatedRows } = await pgClient.query(text, values);
-            const updatedRow = updatedRows[0];
-            foreignKeys.forEach((k, idx) => {
-              output[inflection.column(keys[idx])] = updatedRow[k.name];
-            });
-          }));
+                foreignKeys.forEach((k, idx) => {
+                  output[inflection.column(keys[idx])] = row[k.name];
+                });
+              }),
+          );
 
           if (fieldValue.create) {
             const createData = fieldValue.create;
@@ -483,7 +375,6 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           } = nestedField;
           const modifiedRows = [];
 
-          const ForeignTableType = pgGetGqlTypeByTypeIdAndModifier(foreignTable.type.id, null);
           const fieldValue = inputData[key];
           const { primaryKeyConstraint } = foreignTable;
           const primaryKeys = primaryKeyConstraint ? primaryKeyConstraint.keyAttributes : null;
@@ -492,203 +383,72 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
             throw new Error('Unique relations may only create or connect a single row.');
           }
 
-          const foreignTableConnectorFields = pgNestedTableConnectors[foreignTable.id];
-          await Promise.all(foreignTableConnectorFields.map(async ({
-            fieldName: connectorFieldName,
-            isNodeIdConnector,
-            constraint,
-          }) => {
-            if (!(connectorFieldName in fieldValue)) {
-              return;
-            }
-            const connectorField = Array.isArray(fieldValue[connectorFieldName])
-              ? fieldValue[connectorFieldName]
-              : [fieldValue[connectorFieldName]];
+          await Promise.all(
+            pgNestedTableConnectorFields[foreignTable.id]
+              .filter(f => f.fieldName in fieldValue)
+              .map(async (connectorField) => {
+                const connections = Array.isArray(fieldValue[connectorField.fieldName])
+                  ? fieldValue[connectorField.fieldName]
+                  : [fieldValue[connectorField.fieldName]];
 
-            let where = '';
-
-            if (isNodeIdConnector) {
-              const nodes = connectorField.map((k) => {
-                const nodeId = k[nodeIdFieldName];
-                const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
-                if (Type !== ForeignTableType) {
-                  throw new Error('Mismatched type');
-                }
-                if (identifiers.length !== primaryKeys.length) {
-                  throw new Error('Invalid ID');
-                }
-                return identifiers;
-              });
-              where = sql.fragment`${sql.join(
-                primaryKeys.map(
-                  (k, idx) => sql.fragment`${sql.join(
-                    nodes.map(
-                      node => sql.fragment`${sql.identifier(
-                        k.name,
-                      )} = ${gql2pg(
-                        node[idx],
-                        k.type,
-                        k.typeModifier,
-                      )}`,
-                    ),
-                    ') and (',
-                  )}`,
-                ),
-                ') and (',
-              )}`;
-            } else {
-              const foreignPrimaryKeys = constraint.keyAttributes;
-              where = sql.fragment`(${sql.join(
-                foreignPrimaryKeys.map(
-                  k => sql.fragment`${sql.join(
-                    connectorField.map(
-                      col => sql.fragment`
-                        ${sql.identifier(k.name)} = ${gql2pg(
-                          col[inflection.column(k)],
-                          k.type,
-                          k.typeModifier,
-                        )}
-                      `,
-                    ),
-                    ') or (',
-                  )})`,
-                ),
-                ') and (',
-              )}`;
-            }
-
-            const connectQuery = sql.query`
-              update ${sql.identifier(
-                foreignTable.namespace.name,
-                foreignTable.name,
-              )} set ${sql.join(
-                keys.map((k, i) => sql.fragment`${sql.identifier(k.name)} = ${sql.value(row[foreignKeys[i].name])}`),
-                ', ',
-              )}
-              where ${where}
-              returning *`;
-            const {
-              text: connectQueryText,
-              values: connectQueryValues,
-            } = sql.compile(connectQuery);
-            const { rows: connectedRows } = await pgClient.query(connectQueryText, connectQueryValues);
-            if (primaryKeys) {
-              connectedRows.forEach((connectedRow) => {
-                const rowKeyValues = {};
-                primaryKeys.forEach((k) => {
-                  rowKeyValues[k.name] = connectedRow[k.name];
-                });
-                modifiedRows.push(rowKeyValues);
-              });
-            }
-          }));
-
-          const foreignTableUpdaterFields = pgNestedTableUpdaters[foreignTable.id];
-          await Promise.all(foreignTableUpdaterFields.map(async ({
-            fieldName: updaterFieldName,
-            isNodeIdUpdater,
-            constraint,
-          }) => {
-            if (!(updaterFieldName in fieldValue)) {
-              return;
-            }
-            const updaterField = Array.isArray(fieldValue[updaterFieldName])
-              ? fieldValue[updaterFieldName]
-              : [fieldValue[updaterFieldName]];
-
-            await Promise.all(updaterField.map(async (node) => {
-              let keyWhere = '';
-              if (isNodeIdUpdater) {
-                const nodeId = node[nodeIdFieldName];
-                const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
-                if (Type !== ForeignTableType) {
-                  throw new Error('Mismatched type');
-                }
-                if (identifiers.length !== primaryKeys.length) {
-                  throw new Error('Invalid ID');
-                }
-                keyWhere = sql.fragment`(${sql.join(
-                  primaryKeys.map(
-                    (k, idx) => sql.fragment`
-                      ${sql.identifier(
-                        k.name,
-                      )} = ${gql2pg(
-                        identifiers[idx],
-                        k.type,
-                        k.typeModifier,
-                      )}`,
-                  ),
-                  ') and (',
-                )})`;
-              } else {
-                const foreignPrimaryKeys = constraint.keyAttributes;
-                keyWhere = sql.fragment`(${sql.join(
-                  foreignPrimaryKeys.map(
-                    k => sql.fragment`
-                      ${sql.identifier(k.name)} = ${gql2pg(
-                        node[inflection.column(k)],
-                        k.type,
-                        k.typeModifier,
-                      )}
-                    `,
-                  ),
-                  ') and (',
-                )})`;
-              }
-              const updateInput = node[
-                inflection.patchField(inflection.tableFieldName(foreignTable))
-              ];
-              const sqlColumns = [];
-              const sqlValues = [];
-              foreignTable.attributes.forEach((attr) => {
-                if (!pgColumnFilter(attr, build, context)) return;
-                if (omit(attr, 'update')) return;
-
-                const fieldName = inflection.column(attr);
-                if (fieldName in updateInput) {
-                  const val = updateInput[fieldName];
-                  sqlColumns.push(sql.identifier(attr.name));
-                  sqlValues.push(gql2pg(val, attr.type, attr.typeModifier));
-                }
-              });
-              if (sqlColumns.length === 0) {
-                return;
-              }
-              const relationWhere = sql.fragment`
-                ${sql.join(
-                  keys.map((k, i) => sql.fragment`${sql.identifier(k.name)} = ${sql.value(row[foreignKeys[i].name])}`),
-                  ') and (',
-                )}
-              `;
-              const updateQuery = sql.query`
-                update ${sql.identifier(
-                  foreignTable.namespace.name,
-                  foreignTable.name,
-                )} set ${sql.join(
-                  sqlColumns.map(
-                    (col, i) => sql.fragment`${col} = ${sqlValues[i]}`,
-                  ),
-                  ', ',
-                )}
-                where (${keyWhere}) and (${relationWhere})
-                returning *`;
-
-              const {
-                text: updateQueryText,
-                values: updateQueryValues,
-              } = sql.compile(updateQuery);
-              const { rows: updatedRows } = await pgClient.query(updateQueryText, updateQueryValues);
-              if (primaryKeys) {
-                updatedRows.forEach((updatedRow) => {
-                  const rowKeyValues = {};
-                  primaryKeys.forEach((k) => {
-                    rowKeyValues[k.name] = updatedRow[k.name];
+                await Promise.all(connections.map(async (k) => {
+                  const connectedRow = await pgNestedTableConnect({
+                    nestedField,
+                    connectorField,
+                    input: k,
+                    pgClient,
+                    parentRow: row,
                   });
-                  modifiedRows.push(rowKeyValues);
-                });
-              }
-            }));
-          }));
+
+                  if (primaryKeys) {
+                    const rowKeyValues = {};
+                    primaryKeys.forEach((col) => {
+                      rowKeyValues[col.name] = connectedRow[col.name];
+                    });
+                    modifiedRows.push(rowKeyValues);
+                  }
+                }));
+              }),
+          );
+
+          await Promise.all(
+            pgNestedTableUpdaterFields[foreignTable.id]
+              .filter(f => f.fieldName in fieldValue)
+              .map(async (connectorField) => {
+                const updaterField = Array.isArray(fieldValue[connectorField.fieldName])
+                  ? fieldValue[connectorField.fieldName]
+                  : [fieldValue[connectorField.fieldName]];
+
+                await Promise.all(updaterField.map(async (node) => {
+                  const where = sql.fragment`
+                    ${sql.join(
+                      keys.map((k, i) => sql.fragment`${sql.identifier(k.name)} = ${sql.value(row[foreignKeys[i].name])}`),
+                      ') and (',
+                    )}
+                  `;
+                  const updatedRow = await pgNestedTableUpdate({
+                    nestedField,
+                    connectorField,
+                    input: node,
+                    pgClient,
+                    context,
+                    where,
+                  });
+
+                  if (!updatedRow) {
+                    throw new Error('unmatched update');
+                  }
+
+                  if (primaryKeys) {
+                    const rowKeyValues = {};
+                    primaryKeys.forEach((k) => {
+                      rowKeyValues[k.name] = updatedRow[k.name];
+                    });
+                    modifiedRows.push(rowKeyValues);
+                  }
+                }));
+              }),
+          );
 
           if (fieldValue.create) {
             await Promise.all(fieldValue.create.map(async (rowData) => {

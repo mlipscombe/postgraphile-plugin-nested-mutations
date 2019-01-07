@@ -37,9 +37,90 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
     },
   }));
 
-  builder.hook('build', build => build.extend(build, {
-    pgNestedTableConnectors: {},
-  }));
+  builder.hook('build', (build) => {
+    const {
+      extend,
+      inflection,
+      pgSql: sql,
+      gql2pg,
+      nodeIdFieldName,
+      getTypeAndIdentifiersFromNodeId,
+      pgGetGqlTypeByTypeIdAndModifier,
+    } = build;
+
+    return extend(build, {
+      pgNestedTableConnectorFields: {},
+      pgNestedTableConnect: async ({
+        nestedField,
+        connectorField,
+        input,
+        pgClient,
+        parentRow,
+      }) => {
+        const {
+          foreignTable,
+          keys,
+          foreignKeys,
+        } = nestedField;
+        const {
+          isNodeIdConnector,
+          constraint,
+        } = connectorField;
+
+        const ForeignTableType = pgGetGqlTypeByTypeIdAndModifier(foreignTable.type.id, null);
+        let where = '';
+
+        if (isNodeIdConnector) {
+          const nodeId = input[nodeIdFieldName];
+          const primaryKeys = foreignTable.primaryKeyConstraint.keyAttributes;
+          const { Type, identifiers } = getTypeAndIdentifiersFromNodeId.bind(build)(nodeId);
+          if (Type !== ForeignTableType) {
+            throw new Error('Mismatched type');
+          }
+          if (identifiers.length !== primaryKeys.length) {
+            throw new Error('Invalid ID');
+          }
+          where = sql.fragment`${sql.join(
+            primaryKeys.map(
+              (key, idx) => sql.fragment`${sql.identifier(
+                key.name,
+              )} = ${gql2pg(
+                identifiers[idx],
+                key.type,
+                key.typeModifier,
+              )}`,
+            ),
+            ') and (',
+          )}`;
+        } else {
+          const foreignPrimaryKeys = constraint.keyAttributes;
+          where = sql.fragment`${sql.join(
+            foreignPrimaryKeys.map(
+              k => sql.fragment`
+                ${sql.identifier(k.name)} = ${gql2pg(input[inflection.column(k)], k.type, k.typeModifier)}
+              `,
+            ),
+            ') and (',
+          )}`;
+        }
+        const select = foreignKeys.map(k => sql.identifier(k.name));
+        const query = parentRow
+          ? sql.query`
+            update ${sql.identifier(foreignTable.namespace.name, foreignTable.name)}
+            set ${sql.join(keys.map((k, i) => sql.fragment`${sql.identifier(k.name)} = ${sql.value(parentRow[foreignKeys[i].name])}`), ', ')}
+            where ${where}
+            returning *`
+          : sql.query`
+              select ${sql.join(select, ', ')}
+              from ${sql.identifier(foreignTable.namespace.name, foreignTable.name)}
+              where ${where}`;
+
+        const { text, values } = sql.compile(query);
+        const { rows } = await pgClient.query(text, values);
+        return rows[0];
+      },
+    });
+  });
 
   builder.hook('GraphQLObjectType:fields', (fields, build, context) => {
     const {
@@ -50,7 +131,7 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgGetGqlInputTypeByTypeIdAndModifier: getGqlInputTypeByTypeIdAndModifier,
       pgOmit: omit,
-      pgNestedTableConnectors,
+      pgNestedTableConnectorFields,
       graphql: {
         GraphQLNonNull,
         GraphQLInputObjectType,
@@ -70,7 +151,7 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
       .forEach((table) => {
         const tableFieldName = inflection.tableFieldName(table);
 
-        pgNestedTableConnectors[table.id] = table.constraints
+        pgNestedTableConnectorFields[table.id] = table.constraints
           .filter(con => con.type === 'u' || con.type === 'p')
           .filter(con => !omit(con))
           .filter(con => !con.keyAttributes.some(key => omit(key, 'read')))
@@ -117,7 +198,7 @@ module.exports = function PostGraphileNestedConnectorsPlugin(
 
         const { primaryKeyConstraint } = table;
         if (nodeIdFieldName && primaryKeyConstraint) {
-          pgNestedTableConnectors[table.id].push({
+          pgNestedTableConnectorFields[table.id].push({
             constraint: null,
             keys: null,
             isNodeIdConnector: true,

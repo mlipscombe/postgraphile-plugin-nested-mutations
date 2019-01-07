@@ -115,8 +115,8 @@ module.exports = function PostGraphileNestedTypesPlugin(
       pgIntrospectionResultsByKind: introspectionResultsByKind,
       pgNestedPluginForwardInputTypes,
       pgNestedPluginReverseInputTypes,
-      pgNestedTableConnectors,
-      pgNestedTableUpdaters,
+      pgNestedTableConnectorFields,
+      pgNestedTableUpdaterFields,
       pgNestedFieldName,
       graphql: {
         GraphQLInputObjectType,
@@ -230,7 +230,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
                 type: GraphQLBoolean,
               };
             }
-            pgNestedTableConnectors[foreignTable.id].forEach(({ field, fieldName: connectorFieldName }) => {
+            pgNestedTableConnectorFields[foreignTable.id].forEach(({ field, fieldName: connectorFieldName }) => {
               operations[connectorFieldName] = {
                 description: `The primary key(s) for \`${foreignTableName}\` for the far side of the relationship.`,
                 type: isForward
@@ -238,7 +238,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
                   : (isUnique ? field : new GraphQLList(new GraphQLNonNull(field))),
               };
             });
-            pgNestedTableUpdaters[foreignTable.id].forEach(({ field, fieldName: updaterFieldName }) => {
+            pgNestedTableUpdaterFields[foreignTable.id].forEach(({ field, fieldName: updaterFieldName }) => {
               operations[updaterFieldName] = {
                 description: `The primary key(s) and patch data for \`${foreignTableName}\` for the far side of the relationship.`,
                 type: isForward
