@@ -117,10 +117,10 @@ Connect using any readable primary key or unique constraint on the nested table.
 Create a new record in the nested table.
 
 ### Updating Records
-### `updateByNodeId`
+#### `updateByNodeId`
 Update a record using a `nodeId` from the nested table.
 
-### `updatedBy<K>`
+#### `updatedBy<K>`
 Update a record using any readable primary key or unique constraint on the nested table.
 
 ## Example
