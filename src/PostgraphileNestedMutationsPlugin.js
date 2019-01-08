@@ -214,7 +214,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           : inflection.createPayloadType(table),
       );
       const tableFieldName = isPgUpdateMutationField
-        ? inflection.patchField(table.name)
+        ? inflection.patchField(inflection.tableFieldName(table))
         : inflection.tableFieldName(table);
       const parsedResolveInfoFragment = parseResolveInfo(resolveInfo);
       const resolveData = getDataFromParsedResolveInfoFragment(parsedResolveInfoFragment, PayloadType);
