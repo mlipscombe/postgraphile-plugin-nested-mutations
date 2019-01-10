@@ -314,8 +314,7 @@ test(
   }),
 );
 
-// coming soon
-/* test(
+test(
   'forward nested mutation with nested update does not accept updates to constraint keys',
   withSchema({
     setup: `
@@ -376,4 +375,3 @@ test(
     },
   }),
 );
-*/

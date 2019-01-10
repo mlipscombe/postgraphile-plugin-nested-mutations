@@ -1,5 +1,10 @@
 # Changes
 
+## v1.0.0-alpha.15
+
+  * The patch type for nested updates now correctly omits the keys that are
+    the subject of the nested mutation.
+
 ## v1.0.0-alpha.14
 
   * Support for updating nested records.

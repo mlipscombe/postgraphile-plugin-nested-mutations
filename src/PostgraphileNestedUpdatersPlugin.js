@@ -14,33 +14,40 @@ module.exports = function PostGraphileNestedUpdatersPlugin(
     nestedUpdateByNodeIdInputType(options) {
       const {
         table,
+        constraint,
       } = options;
 
-      const tableFieldName = inflection.tableFieldName(table);
+      const tableFieldName = this.tableFieldName(table);
+      const parentTableFieldName = this.tableFieldName(constraint.class);
+      const constraintName = constraint.tags.name || constraint.name;
 
-      return this.upperCamelCase(`${tableFieldName}_node_id_update`);
+      return this.upperCamelCase(`${tableFieldName}_on_${parentTableFieldName}_for_${constraintName}_node_id_update`);
     },
     nestedUpdatePatchType(options) {
       const {
         table,
         constraint,
       } = options;
-      return this.camelCase(`update_${table.name}_by_${constraint.keyAttributes.map(k => k.name).join('_and_')}_patch`);
+
+      const tableFieldName = this.tableFieldName(table);
+      const parentTableFieldName = this.tableFieldName(constraint.class);
+      const constraintName = constraint.tags.name || constraint.name;
+
+      return this.camelCase(`update_${tableFieldName}_on_${parentTableFieldName}_for_${constraintName}_patch`);
     },
     nestedUpdateByKeyInputType(options) {
       const {
         table,
-        constraint: {
-          name,
-          tags: {
-            name: tagName,
-          },
-        },
+        constraint,
+        keyConstraint,
       } = options;
 
       const tableFieldName = this.tableFieldName(table);
+      const parentTableFieldName = this.tableFieldName(constraint.class);
+      const constraintName = constraint.tags.name || constraint.name;
+      const keyConstraintName = keyConstraint.tags.name || keyConstraint.name;
 
-      return this.upperCamelCase(`${tableFieldName}_${tagName || name}_update`);
+      return this.upperCamelCase(`${tableFieldName}_on_${parentTableFieldName}_for_${constraintName}_using_${keyConstraintName}_update`);
     },
   }));
 
@@ -182,122 +189,134 @@ module.exports = function PostGraphileNestedUpdatersPlugin(
     introspectionResultsByKind.class
       .filter(cls => cls.namespace && cls.isSelectable)
       .forEach((table) => {
-        const TableType = pgGetGqlTypeByTypeIdAndModifier(
-          table.type.id,
-          null,
-        );
-        const tableFieldName = inflection.tableFieldName(table);
-        const patchFieldName = inflection.patchField(tableFieldName);
-        const TablePatch = getTypeByName(
-          inflection.patchType(TableType.name),
-        );
-
-        pgNestedTableUpdaterFields[table.id] = table.constraints
-          .filter(con => con.type === 'u' || con.type === 'p')
-          .filter(con => !omit(con))
+        pgNestedTableUpdaterFields[table.id] = pgNestedTableUpdaterFields[table.id] || {};
+        introspectionResultsByKind.constraint
+          .filter(con => con.type === 'f')
+          .filter(con => con.classId === table.id || con.foreignClassId === table.id)
+          .filter(con => !omit(con, 'read'))
           .filter(con => !con.keyAttributes.some(key => omit(key, 'read')))
-          .map((constraint) => {
-            const keys = constraint.keyAttributes;
+          .forEach((constraint) => {
+            const foreignTable = constraint.classId === table.id
+              ? constraint.foreignClass
+              : constraint.class;
+            const ForeignTableType = pgGetGqlTypeByTypeIdAndModifier(
+              foreignTable.type.id,
+              null,
+            );
+            const foreignTableFieldName = inflection.tableFieldName(foreignTable);
+            const patchFieldName = inflection.patchField(foreignTableFieldName);
+            const ForeignTablePatch = getTypeByName(
+              inflection.patchType(ForeignTableType.name),
+            );
 
-            // istanbul ignore next
-            if (!keys.every(_ => _)) {
-              throw new Error(
-                `Consistency error: could not find an attribute in the constraint when building nested connection type for ${describePgEntity(
-                  table,
-                )}!`,
-              );
-            }
-
-            // XXX: this needs to move to where they are created on the other side.
             const patchType = newWithHooks(
               GraphQLInputObjectType,
               {
-                name: inflection.nestedUpdatePatchType({ table, constraint }),
-                description: `An object where the defined keys will be set on the \`${tableFieldName}\` being updated.`,
+                name: inflection.nestedUpdatePatchType({ table: foreignTable, constraint }),
+                description: `An object where the defined keys will be set on the \`${foreignTableFieldName}\` being updated.`,
                 fields: () => {
                   const omittedFields = constraint.keyAttributes.map(k => inflection.column(k));
-                  return Object.keys(TablePatch._fields)
+                  return Object.keys(ForeignTablePatch._fields)
                     .filter(key => !omittedFields.includes(key))
-                    .map(k => Object.assign({}, { [k]: TablePatch._fields[k] }))
+                    .map(k => Object.assign({}, { [k]: ForeignTablePatch._fields[k] }))
                     .reduce((res, o) => Object.assign(res, o), {});
                 },
               }, {
                 isNestedMutationPatchType: true,
-                pgInflection: table,
+                pgInflection: foreignTable,
                 pgFieldInflection: constraint,
               },
             );
 
-            return {
-              constraint,
-              keys: constraint.keyAttributes,
-              isNodeIdUpdater: false,
-              fieldName: inflection.nestedUpdateByKeyField({ table, constraint }),
-              field: newWithHooks(
-                GraphQLInputObjectType,
-                {
-                  name: inflection.nestedUpdateByKeyInputType({ table, constraint }),
-                  description: `The fields on \`${tableFieldName}\` to look up the row to update.`,
-                  fields: () => Object.assign(
-                    {},
+            const foreignFields = foreignTable.constraints
+              .filter(con => con.type === 'u' || con.type === 'p')
+              .filter(con => !omit(con))
+              .filter(con => !con.keyAttributes.some(key => omit(key, 'read')))
+              .map((keyConstraint) => {
+                const keys = keyConstraint.keyAttributes;
+
+                // istanbul ignore next
+                if (!keys.every(_ => _)) {
+                  throw new Error(
+                    `Consistency error: could not find an attribute in the constraint when building nested connection type for ${describePgEntity(
+                      foreignTable,
+                    )}!`,
+                  );
+                }
+
+                return {
+                  constraint: keyConstraint,
+                  keys: keyConstraint.keyAttributes,
+                  isNodeIdUpdater: false,
+                  fieldName: inflection.nestedUpdateByKeyField({ table: foreignTable, constraint: keyConstraint }),
+                  field: newWithHooks(
+                    GraphQLInputObjectType,
                     {
+                      name: inflection.nestedUpdateByKeyInputType({ table: foreignTable, constraint, keyConstraint }),
+                      description: `The fields on \`${foreignTableFieldName}\` to look up the row to update.`,
+                      fields: () => Object.assign(
+                        {},
+                        {
+                          [patchFieldName]: {
+                            description: `An object where the defined keys will be set on the \`${foreignTableFieldName}\` being updated.`,
+                            type: new GraphQLNonNull(patchType),
+                          },
+                        },
+                        keys
+                          .map(k => Object.assign({}, {
+                            [inflection.column(k)]: {
+                              description: k.description,
+                              type: new GraphQLNonNull(pgGetGqlInputTypeByTypeIdAndModifier(k.typeId, k.typeModifier)),
+                            },
+                          }))
+                          .reduce((res, o) => Object.assign(res, o), {}),
+                      ),
+                    },
+                    {
+                      isNestedMutationInputType: true,
+                      isNestedMutationUpdateInputType: true,
+                      pgInflection: foreignTable,
+                      pgFieldInflection: constraint,
+                    },
+                  ),
+                };
+              });
+
+            const { primaryKeyConstraint: foreignPrimaryKey } = foreignTable;
+            if (nodeIdFieldName && foreignPrimaryKey) {
+              foreignFields.push({
+                constraint: null,
+                keys: null,
+                isNodeIdUpdater: true,
+                fieldName: inflection.nestedUpdateByNodeIdField(),
+                field: newWithHooks(
+                  GraphQLInputObjectType,
+                  {
+                    name: inflection.nestedUpdateByNodeIdInputType({ table, constraint }),
+                    description: 'The globally unique `ID` look up for the row to update.',
+                    fields: {
+                      [nodeIdFieldName]: {
+                        description: `The globally unique \`ID\` which identifies a single \`${foreignTableFieldName}\` to be connected.`,
+                        type: new GraphQLNonNull(GraphQLID),
+                      },
                       [patchFieldName]: {
-                        description: `An object where the defined keys will be set on the \`${tableFieldName}\` being updated.`,
-                        type: new GraphQLNonNull(patchType),
+                        description: `An object where the defined keys will be set on the \`${foreignTableFieldName}\` being updated.`,
+                        type: new GraphQLNonNull(ForeignTablePatch),
                       },
                     },
-                    keys
-                      .map(k => Object.assign({}, {
-                        [inflection.column(k)]: {
-                          description: k.description,
-                          type: new GraphQLNonNull(pgGetGqlInputTypeByTypeIdAndModifier(k.typeId, k.typeModifier)),
-                        },
-                      }))
-                      .reduce((res, o) => Object.assign(res, o), {}),
-                  ),
-                },
-                {
-                  isNestedMutationInputType: true,
-                  isNestedMutationUpdateInputType: true,
-                  pgInflection: table,
-                  pgFieldInflection: constraint,
-                },
-              ),
-            };
-          });
+                  },
+                  {
+                    isNestedMutationInputType: true,
+                    isNestedMutationUpdateInputType: true,
+                    isNestedMutationUpdateByNodeIdType: true,
+                    pgInflection: foreignTable,
+                  },
+                ),
+              });
+            }
 
-        const { primaryKeyConstraint } = table;
-        if (nodeIdFieldName && primaryKeyConstraint) {
-          pgNestedTableUpdaterFields[table.id].push({
-            constraint: null,
-            keys: null,
-            isNodeIdUpdater: true,
-            fieldName: inflection.nestedUpdateByNodeIdField(),
-            field: newWithHooks(
-              GraphQLInputObjectType,
-              {
-                name: inflection.nestedUpdateByNodeIdInputType({ table }),
-                description: 'The globally unique `ID` look up for the row to update.',
-                fields: {
-                  [nodeIdFieldName]: {
-                    description: `The globally unique \`ID\` which identifies a single \`${tableFieldName}\` to be connected.`,
-                    type: new GraphQLNonNull(GraphQLID),
-                  },
-                  [patchFieldName]: {
-                    description: `An object where the defined keys will be set on the \`${tableFieldName}\` being updated.`,
-                    type: new GraphQLNonNull(TablePatch),
-                  },
-                },
-              },
-              {
-                isNestedMutationInputType: true,
-                isNestedMutationUpdateInputType: true,
-                isNestedMutationUpdateByNodeIdType: true,
-                pgInflection: table,
-              },
-            ),
+            pgNestedTableUpdaterFields[table.id][constraint.id] = foreignFields;
           });
-        }
       });
 
     return fields;

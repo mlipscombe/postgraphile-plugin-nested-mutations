@@ -1,6 +1,6 @@
 {
   "name": "postgraphile-plugin-nested-mutations",
-  "version": "1.0.0-alpha.14",
+  "version": "1.0.0-alpha.15",
   "description": "Nested mutations plugin for PostGraphile",
   "main": "index.js",
   "repository": {
@@ -20,7 +20,7 @@
     "graphile-build-pg": "^4.2.0"
   },
   "peerDependencies": {
-    "postgraphile": "^4.0.0-rc.2"
+    "postgraphile-core": "^4.2.0"
   },
   "devDependencies": {
     "eslint": "^5.10.0",

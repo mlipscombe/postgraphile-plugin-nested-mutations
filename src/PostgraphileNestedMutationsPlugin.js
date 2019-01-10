@@ -126,6 +126,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         .filter(k => Object.prototype.hasOwnProperty.call(input, k.name))
         .map(async (nestedField) => {
           const {
+            constraint,
             foreignTable,
             keys,
             foreignKeys,
@@ -155,7 +156,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           );
 
           await Promise.all(
-            pgNestedTableUpdaterFields[foreignTable.id]
+            pgNestedTableUpdaterFields[table.id][constraint.id]
               .filter(f => f.fieldName in fieldValue)
               .map(async (connectorField) => {
                 const row = await pgNestedTableUpdate({
@@ -368,6 +369,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           }
 
           const {
+            constraint,
             foreignTable,
             keys, // nested table's keys
             foreignKeys, // main mutation table's keys
@@ -412,7 +414,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
           );
 
           await Promise.all(
-            pgNestedTableUpdaterFields[foreignTable.id]
+            pgNestedTableUpdaterFields[table.id][constraint.id]
               .filter(f => f.fieldName in fieldValue)
               .map(async (connectorField) => {
                 const updaterField = Array.isArray(fieldValue[connectorField.fieldName])

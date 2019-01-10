@@ -238,7 +238,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
                   : (isUnique ? field : new GraphQLList(new GraphQLNonNull(field))),
               };
             });
-            pgNestedTableUpdaterFields[foreignTable.id].forEach(({ field, fieldName: updaterFieldName }) => {
+            pgNestedTableUpdaterFields[table.id][constraint.id].forEach(({ field, fieldName: updaterFieldName }) => {
               operations[updaterFieldName] = {
                 description: `The primary key(s) and patch data for \`${foreignTableName}\` for the far side of the relationship.`,
                 type: isForward
