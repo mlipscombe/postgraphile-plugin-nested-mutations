@@ -1,6 +1,6 @@
 {
   "name": "postgraphile-plugin-nested-mutations",
-  "version": "1.0.0-alpha.16",
+  "version": "1.0.0-alpha.17",
   "description": "Nested mutations plugin for PostGraphile",
   "main": "index.js",
   "repository": {
