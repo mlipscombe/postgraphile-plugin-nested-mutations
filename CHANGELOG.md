@@ -1,5 +1,10 @@
 # Changes
 
+## v1.0.0-alpha.16
+
+  * Support `deleteOthers` where there are no other records modified.  Thanks
+    @srp.
+
 ## v1.0.0-alpha.15
 
   * The patch type for nested updates now correctly omits the keys that are
