@@ -50,6 +50,8 @@ module.exports = function PostGraphileNestedTypesPlugin(
             keyAttributes: keys,
             foreignKeyAttributes: foreignKeys,
             tags: {
+              fieldName,
+              foreignFieldName,
               forwardMutationName,
               reverseMutationName,
             },
@@ -85,6 +87,9 @@ module.exports = function PostGraphileNestedTypesPlugin(
           if (forwardMutationName) {
             return forwardMutationName;
           }
+          if (fieldName) {
+            return fieldName;
+          }
           if (nestedMutationsSimpleFieldNames && !multipleFKs) {
             return inflection.camelCase(`${tableFieldName}`);
           }
@@ -94,6 +99,9 @@ module.exports = function PostGraphileNestedTypesPlugin(
         // reverse mutation
         if (reverseMutationName) {
           return reverseMutationName;
+        }
+        if (foreignFieldName) {
+          return foreignFieldName;
         }
         if (!multipleFKs) {
           return nestedMutationsSimpleFieldNames

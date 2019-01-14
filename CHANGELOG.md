@@ -1,5 +1,12 @@
 # Changes
 
+## v1.0.0-alpha.17
+
+  * Add support for `@fieldName` and `@foreignFieldName` smart comments on 
+    foreign keys to match those used in PostGraphile.  The original 
+    `@forwardMutationName` and `@reverseMutationName` smart comments will
+    remain to allow for renaming the fields just for nested mutations.
+
 ## v1.0.0-alpha.16
 
   * Support `deleteOthers` where there are no other records modified.  Thanks
