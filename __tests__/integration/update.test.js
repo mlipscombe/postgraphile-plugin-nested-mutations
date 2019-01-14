@@ -127,6 +127,63 @@ test(
 );
 
 test(
+  'deleteOthers removes all records if none are modified',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+      insert into p.parent values(1, 'test');
+      insert into p.child values(99, 1, 'test child');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          updateParentById(
+            input: {
+              id: 1
+              parentPatch: {
+                childrenUsingId: {
+                  deleteOthers: true
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                }
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const data = result.data.updateParentById.parent;
+      expect(data.childrenByParentId.nodes).toHaveLength(0);
+    },
+  }),
+);
+
+test(
   'deleteOthers is not available when no primary key on the foreign relation',
   withSchema({
     setup: `

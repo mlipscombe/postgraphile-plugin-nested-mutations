@@ -492,25 +492,30 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
               ),
               ') and (',
             )})`;
-            const rowCondition = sql.fragment`
-              ${sql.join(
-                modifiedRows.map(r => sql.fragment`${sql.join(
-                  Object.keys(r).map(
-                    k => sql.fragment`
-                      ${sql.identifier(k)} <> ${sql.value(r[k])}
-                    `,
-                  ),
-                  ' and ',
-                )}`),
-                ') and (',
-              )}`;
+            let rowCondition;
+            if (modifiedRows.length === 0) {
+              rowCondition = sql.fragment``;
+            } else {
+              rowCondition = sql.fragment` and (
+                ${sql.join(
+                  modifiedRows.map(r => sql.fragment`${sql.join(
+                    Object.keys(r).map(
+                      k => sql.fragment`
+                        ${sql.identifier(k)} <> ${sql.value(r[k])}
+                      `,
+                    ),
+                    ' and ',
+                  )}`),
+                  ') and (',
+                )})`;
+            }
 
             const deleteQuery = sql.query`
               delete from ${sql.identifier(
                 foreignTable.namespace.name,
                 foreignTable.name,
               )}
-              where (${keyCondition}) and (${rowCondition})`;
+              where (${keyCondition})${rowCondition}`;
             const {
               text: deleteQueryText,
               values: deleteQueryValues,
