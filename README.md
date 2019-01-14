@@ -207,5 +207,5 @@ renaming the nested mutation fields.
 
 ```sql
 comment on constraint child_parent_fkey on child is
-  E'@forwardMutationName parent\n@reverseMutationName children';
+  E'@fieldName parent\n@foreignFieldName children';
 ```
