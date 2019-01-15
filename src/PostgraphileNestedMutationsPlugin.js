@@ -136,7 +136,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
 
           await Promise.all(
             pgNestedTableConnectorFields[foreignTable.id]
-              .filter(f => f.fieldName in fieldValue)
+              .filter(f => fieldValue[f.fieldName])
               .map(async (connectorField) => {
                 const row = await pgNestedTableConnect({
                   nestedField,
@@ -157,7 +157,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
 
           await Promise.all(
             pgNestedTableUpdaterFields[table.id][constraint.id]
-              .filter(f => f.fieldName in fieldValue)
+              .filter(f => fieldValue[f.fieldName])
               .map(async (connectorField) => {
                 const row = await pgNestedTableUpdate({
                   nestedField,
@@ -387,7 +387,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
 
           await Promise.all(
             pgNestedTableConnectorFields[foreignTable.id]
-              .filter(f => f.fieldName in fieldValue)
+              .filter(f => fieldValue[f.fieldName])
               .map(async (connectorField) => {
                 const connections = Array.isArray(fieldValue[connectorField.fieldName])
                   ? fieldValue[connectorField.fieldName]
@@ -415,7 +415,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
 
           await Promise.all(
             pgNestedTableUpdaterFields[table.id][constraint.id]
-              .filter(f => f.fieldName in fieldValue)
+              .filter(f => fieldValue[f.fieldName])
               .map(async (connectorField) => {
                 const updaterField = Array.isArray(fieldValue[connectorField.fieldName])
                   ? fieldValue[connectorField.fieldName]

@@ -1,5 +1,9 @@
 # Changes
 
+## v1.0.0-alpha.18
+
+  * Correctly handle `null` values to connect and update fields.
+
 ## v1.0.0-alpha.17
 
   * Add support for `@fieldName` and `@foreignFieldName` smart comments on 
