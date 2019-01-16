@@ -246,6 +246,71 @@ test(
 );
 
 test(
+  'deleteOthers is not available if foreign table has @omit delete',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+      
+      create table p.child (
+        id integer primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      comment on table p.child is E'@omit delete';
+
+      insert into p.parent values(1, 'test');
+      insert into p.child values(99, 1, 'test child');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          updateParentById(
+            input: {
+              id: 1
+              parentPatch: {
+                childrenUsingId: {
+                  deleteOthers: true
+                  create: [{
+                    id: 1
+                    name: "test child 2"
+                  }, {
+                    id: 2
+                    name: "test child 3"
+                  }]
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                }
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).toHaveProperty('errors');
+      expect(result.errors[0].message).toMatch(/"deleteOthers" is not defined/);
+    },
+  }),
+);
+
+test(
   'forward nested mutation with nested update',
   withSchema({
     setup: `
@@ -275,6 +340,82 @@ test(
                 childrenUsingId: {
                   updateById: {
                     id: 1
+                    childPatch: {
+                      name: "renamed child"
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                }
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const data = result.data.updateParentById.parent;
+      expect(data.childrenByParentId.nodes).toHaveLength(1);
+      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      expect(data.childrenByParentId.nodes[0].name).toEqual('renamed child');
+    },
+  }),
+);
+
+test(
+  'forward nested mutation with nested updateByNodeId',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+      
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      insert into p.parent values(1, 'test parent');
+      insert into p.child values(1, 1, 'test child');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const lookupQuery = `
+        query {
+          childById(id: 1) {
+            nodeId
+          }
+        }
+      `;
+      const lookupResult = await graphql(schema, lookupQuery, null, { pgClient });
+      const { nodeId } = lookupResult.data.childById;
+      expect(nodeId).not.toBeUndefined();
+
+      const query = `
+        mutation {
+          updateParentById(
+            input: {
+              id: 1
+              parentPatch: {
+                childrenUsingId: {
+                  updateByNodeId: {
+                    nodeId: "${nodeId}"
                     childPatch: {
                       name: "renamed child"
                     }

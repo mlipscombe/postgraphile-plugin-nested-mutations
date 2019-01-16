@@ -185,6 +185,10 @@ module.exports = function PostGraphileNestedTypesPlugin(
         && !constraint.keyAttributes.some(key => omit(key, 'create'));
       const updateable = !omit(foreignTable, 'update')
         && !omit(constraint, 'update');
+      const deleteable = nestedMutationsDeleteOthers
+        && foreignTable.primaryKeyConstraint
+        && !omit(foreignTable, 'delete')
+        && !omit(constraint, 'delete');
 
       if (
         (!connectable && !creatable && !updateable)
@@ -232,7 +236,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
             const gqlForeignTableType = getGqlInputTypeByTypeIdAndModifier(foreignTable.type.id, null);
             const operations = {};
 
-            if (!isForward && nestedMutationsDeleteOthers && foreignTable.primaryKeyConstraint) {
+            if (!isForward && deleteable) {
               operations.deleteOthers = {
                 description: `Flag indicating whether all other \`${foreignTableName}\` records that match this relationship should be removed.`,
                 type: GraphQLBoolean,

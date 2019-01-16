@@ -1,5 +1,11 @@
 # Changes
 
+## v1.0.0-alpha.19
+
+  * `deleteOthers` now is not in the schema where the foreign table
+     has `@omit delete`.
+  * Fixed error that prevented `updateByNodeId` from working.
+
 ## v1.0.0-alpha.18
 
   * Correctly handle `null` values to connect and update fields.

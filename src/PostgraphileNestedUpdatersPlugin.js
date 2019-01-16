@@ -59,7 +59,6 @@ module.exports = function PostGraphileNestedUpdatersPlugin(
       pgSql: sql,
       pgColumnFilter,
       pgOmit: omit,
-      getTypeAndIdentifiersFromNodeId,
       pgGetGqlTypeByTypeIdAndModifier,
       nodeIdFieldName,
     } = build;
@@ -87,7 +86,7 @@ module.exports = function PostGraphileNestedUpdatersPlugin(
         if (isNodeIdUpdater) {
           const nodeId = input[nodeIdFieldName];
           const primaryKeys = foreignTable.primaryKeyConstraint.keyAttributes;
-          const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
+          const { Type, identifiers } = build.getTypeAndIdentifiersFromNodeId(nodeId);
           const ForeignTableType = pgGetGqlTypeByTypeIdAndModifier(foreignTable.type.id, null);
           if (Type !== ForeignTableType) {
             throw new Error('Mismatched type');
