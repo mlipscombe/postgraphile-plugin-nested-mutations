@@ -155,6 +155,69 @@ test(
 );
 
 test(
+  'forward nested mutation with null outer nested field succeeds',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      insert into p.child values(6, null, 'test child 1');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          a1: createParent(
+            input: {
+              parent: {
+                name: "test f1"
+                childrenUsingId: null
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                }
+              }
+            }
+          }
+          a2: createChild(
+            input: {
+              child: {
+                name: "test child 2"
+                parentToParentId: null
+              }
+            }
+          ) {
+            child {
+              id
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+    },
+  }),
+);
+test(
   'forward deeply nested mutation creates records',
   withSchema({
     setup: `

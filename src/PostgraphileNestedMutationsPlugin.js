@@ -123,7 +123,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       const nestedFields = pgNestedPluginForwardInputTypes[table.id];
       const output = Object.assign({}, input);
       await Promise.all(nestedFields
-        .filter(k => Object.prototype.hasOwnProperty.call(input, k.name))
+        .filter(k => input[k.name])
         .map(async (nestedField) => {
           const {
             constraint,
@@ -305,7 +305,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
               )}`;
             } catch (e) {
               debug(e);
-              return null;
+              throw e;
             }
           } else {
             const { keyAttributes: keys } = pgFieldConstraint;
@@ -364,7 +364,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         await Promise.all(Object.keys(inputData).map(async (key) => {
           const nestedField = pgNestedPluginReverseInputTypes[table.id]
             .find(obj => obj.name === key);
-          if (!nestedField) {
+          if (!nestedField || !inputData[key]) {
             return;
           }
 
