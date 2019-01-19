@@ -1,5 +1,9 @@
 # Changes
 
+## v1.0.0-alpha.20
+
+  * Fix case where a mutation specified `nestedMutationField: null`.
+
 ## v1.0.0-alpha.19
 
   * `deleteOthers` now is not in the schema where the foreign table
