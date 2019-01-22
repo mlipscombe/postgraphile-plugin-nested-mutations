@@ -284,14 +284,14 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
             const nodeId = input[nodeIdFieldName];
             try {
               const { Type, identifiers } = getTypeAndIdentifiersFromNodeId(nodeId);
-              const primaryKeys = table.primaryKeyConstraints.keyAttributes;
+              const primaryKeys = table.primaryKeyConstraint.keyAttributes;
               if (Type !== TableType) {
                 throw new Error('Mismatched type');
               }
               if (identifiers.length !== primaryKeys.length) {
                 throw new Error('Invalid ID');
               }
-              condition = `${sql.join(
+              condition = sql.fragment`${sql.join(
                 table.primaryKeyConstraint.keyAttributes.map(
                   (key, idx) => sql.fragment`${sql.identifier(
                     key.name,

@@ -1,6 +1,6 @@
 {
   "name": "postgraphile-plugin-nested-mutations",
-  "version": "1.0.0-alpha.20",
+  "version": "1.0.0-alpha.21",
   "description": "Nested mutations plugin for PostGraphile",
   "main": "index.js",
   "repository": {
@@ -23,6 +23,7 @@
     "postgraphile-core": "^4.2.0"
   },
   "devDependencies": {
+    "@graphile-contrib/pg-simplify-inflector": "^4.0.0-alpha.0",
     "eslint": "^5.10.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",

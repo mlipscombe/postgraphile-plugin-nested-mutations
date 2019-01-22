@@ -18,6 +18,11 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
+"@graphile-contrib/pg-simplify-inflector@^4.0.0-alpha.0":
+  version "4.0.0-alpha.0"
+  resolved "https://registry.yarnpkg.com/@graphile-contrib/pg-simplify-inflector/-/pg-simplify-inflector-4.0.0-alpha.0.tgz#e3053b777a9e86051cc2be21de9e8b27ef87ceb0"
+  integrity sha512-nm4Yfoi+8u5bARX8DV8UpHu5w0QkKEDAg9/Fi84ujPYCpMHmrBCDgBjRATVXxp2WUUzajq0C2Acg8TMzYGjqwg==
+
 "@types/graphql@^14.0.3":
   version "14.0.3"
   resolved "https://registry.yarnpkg.com/@types/graphql/-/graphql-14.0.3.tgz#389e2e5b83ecdb376d9f98fae2094297bc112c1c"

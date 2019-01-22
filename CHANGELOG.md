@@ -1,5 +1,9 @@
 # Changes
 
+## v1.0.0-alpha.21
+
+  * Really fix `updateByNodeId`.  Thanks for the report @ken0x0a!
+
 ## v1.0.0-alpha.20
 
   * Fix case where a mutation specified `nestedMutationField: null`.

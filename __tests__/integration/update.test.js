@@ -573,3 +573,75 @@ test(
     },
   }),
 );
+
+test(
+  'forward nested mutation during update',
+  withSchema({
+    setup: `
+      CREATE TABLE p."user" (
+        "id" bigint PRIMARY KEY DEFAULT 1,
+        "username" text NOT NULL UNIQUE,
+        "name" text NOT NULL,
+        "avatar" text,
+        "description" text,
+        "favorite_count" integer DEFAULT 0 NOT NULL
+      );
+      CREATE TABLE p."user_private" (
+        "id" bigint NOT NULL PRIMARY KEY REFERENCES p."user"("id") ON DELETE CASCADE ON UPDATE CASCADE DEFAULT 1,
+        -- "email" text UNIQUE NOT NULL,
+        "update" boolean DEFAULT false NOT NULL,
+        "settings" jsonb DEFAULT '{}'::jsonb,
+        "notification_email" jsonb DEFAULT '{}'::jsonb
+      )
+      with (fillfactor=85);
+      comment on constraint user_private_id_fkey on p.user_private is
+        E'@foreignFieldName private\n@fieldName user'; -- User { private }
+    `,
+    options: {
+      appendPlugins: [
+        require('../../index.js'),
+        require('@graphile-contrib/pg-simplify-inflector'),
+      ],
+      simpleCollections: 'both',
+      legacyRelations: 'omit',
+      graphileBuildOptions: {
+        nestedMutationsDeleteOthers: false,
+        nestedMutationsSimpleFieldNames: true,
+      },
+    },
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation createUser {
+          o1: createUser(input: {
+            user: {
+              username:"yey"
+              name: "u"
+            }
+          }) {
+            user {
+              id
+              name
+              username
+            }
+          }
+          o2: updateUser(
+            input: {
+              nodeId: "WyJ1c2VycyIsMV0="
+              patch: {
+                name: "this"
+              }
+            }
+          ) {
+            user {
+              name
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+    },
+  }),
+);
