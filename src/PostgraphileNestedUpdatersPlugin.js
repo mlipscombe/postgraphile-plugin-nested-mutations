@@ -208,6 +208,10 @@ module.exports = function PostGraphileNestedUpdatersPlugin(
               inflection.patchType(ForeignTableType.name),
             );
 
+            if (!ForeignTablePatch) {
+              return;
+            }
+
             const patchType = newWithHooks(
               GraphQLInputObjectType,
               {
