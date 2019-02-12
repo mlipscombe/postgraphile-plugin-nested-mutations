@@ -251,7 +251,9 @@ test(
 
       const result = await graphql(schema, query, null, { pgClient });
       expect(result).toHaveProperty('errors');
-      expect(result.errors[0].message).toMatch(/may only create or connect a single row/);
+      expect(result.errors[0].message).toMatch(
+        /may only create or connect a single row/,
+      );
     },
   }),
 );

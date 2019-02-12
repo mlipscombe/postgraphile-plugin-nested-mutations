@@ -58,7 +58,9 @@ test(
 
       const data = result.data.updateParentById.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(3);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
     },
   }),
 );
@@ -121,7 +123,9 @@ test(
 
       const data = result.data.updateParentById.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
     },
   }),
 );
@@ -369,7 +373,9 @@ test(
 
       const data = result.data.updateParentById.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(1);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
       expect(data.childrenByParentId.nodes[0].name).toEqual('renamed child');
     },
   }),
@@ -403,7 +409,9 @@ test(
           }
         }
       `;
-      const lookupResult = await graphql(schema, lookupQuery, null, { pgClient });
+      const lookupResult = await graphql(schema, lookupQuery, null, {
+        pgClient,
+      });
       const { nodeId } = lookupResult.data.childById;
       expect(nodeId).not.toBeUndefined();
 
@@ -445,7 +453,9 @@ test(
 
       const data = result.data.updateParentById.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(1);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
       expect(data.childrenByParentId.nodes[0].name).toEqual('renamed child');
     },
   }),
@@ -480,7 +490,9 @@ test(
           }
         }
       `;
-      const lookupResult = await graphql(schema, lookupQuery, null, { pgClient });
+      const lookupResult = await graphql(schema, lookupQuery, null, {
+        pgClient,
+      });
       const { nodeId } = lookupResult.data.childByIdAndParentIdAndName;
       expect(nodeId).not.toBeUndefined();
 
@@ -522,7 +534,9 @@ test(
 
       const data = result.data.updateParentById.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(1);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
       expect(data.childrenByParentId.nodes[0].name).toEqual('renamed child');
     },
   }),

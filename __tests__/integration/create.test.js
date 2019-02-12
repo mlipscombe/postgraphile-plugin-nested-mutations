@@ -1,4 +1,3 @@
-
 const { graphql } = require('graphql');
 const { withSchema } = require('../helpers');
 
@@ -90,7 +89,9 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
     },
   }),
 );
@@ -297,7 +298,9 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
     },
   }),
 );
@@ -331,7 +334,9 @@ test(
           }
         }
       `;
-      const lookupResult = await graphql(schema, lookupQuery, null, { pgClient });
+      const lookupResult = await graphql(schema, lookupQuery, null, {
+        pgClient,
+      });
       const { nodeId } = lookupResult.data.childById;
       expect(nodeId).not.toBeUndefined();
 
@@ -380,7 +385,9 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(5);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
     },
   }),
 );
@@ -439,7 +446,6 @@ test(
     },
   }),
 );
-
 
 test(
   'reverse nested mutation creates records',
@@ -579,7 +585,9 @@ test(
           }
         }
       `;
-      const lookupResult = await graphql(schema, lookupQuery, null, { pgClient });
+      const lookupResult = await graphql(schema, lookupQuery, null, {
+        pgClient,
+      });
       const { nodeId } = lookupResult.data.parentById;
       expect(nodeId).not.toBeUndefined();
 
@@ -679,7 +687,9 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toEqual(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toEqual(data.id),
+      );
     },
   }),
 );
@@ -742,8 +752,9 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentIdAndParentName.nodes).toHaveLength(2);
-      data.childrenByParentIdAndParentName.nodes
-        .map(n => expect([n.parentId, n.parentName]).toEqual([data.id, data.name]));
+      data.childrenByParentIdAndParentName.nodes.map((n) =>
+        expect([n.parentId, n.parentName]).toEqual([data.id, data.name]),
+      );
     },
   }),
 );
@@ -807,7 +818,9 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
     },
   }),
 );

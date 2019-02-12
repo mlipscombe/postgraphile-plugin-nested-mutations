@@ -26,12 +26,15 @@
     "@graphile-contrib/pg-simplify-inflector": "^4.0.0-alpha.0",
     "eslint": "^5.10.0",
     "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^4.0.0",
     "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "graphql": "^14.0.2",
     "jest": "^23.6.0",
     "jest-junit": "^5.2.0",
     "pg": "^7.7.1",
-    "postgraphile-core": "^4.2.0"
+    "postgraphile-core": "^4.2.0",
+    "prettier": "^1.16.4"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$",
@@ -43,14 +46,19 @@
   "files": [
     "src"
   ],
+  "prettier": {
+    "trailingComma": "all",
+    "semi": true,
+    "singleQuote": true,
+    "arrowParens": "always"
+  },
   "eslintConfig": {
-    "parserOptions": {
-      "ecmaFeatures": {
-        "jsx": true
-      }
-    },
     "extends": [
-      "airbnb-base"
+      "airbnb-base",
+      "prettier"
+    ],
+    "plugins": [
+      "prettier"
     ],
     "env": {
       "jest": true
@@ -60,6 +68,7 @@
       "jasmine": false
     },
     "rules": {
+      "prettier/prettier": "error",
       "import/no-unresolved": 0,
       "import/no-extraneous-dependencies": 0,
       "import/extensions": 0,

@@ -112,7 +112,9 @@ test(
 
       const result = await graphql(schema, query, null, { pgClient });
       expect(result).toHaveProperty('errors');
-      expect(result.errors[0].message).toMatch(/"childrenUsingId" is not defined/);
+      expect(result.errors[0].message).toMatch(
+        /"childrenUsingId" is not defined/,
+      );
     },
   }),
 );
@@ -231,7 +233,9 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
     },
   }),
 );
@@ -292,7 +296,9 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
     },
   }),
 );
@@ -465,7 +471,9 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.childrenByParentId.nodes).toHaveLength(2);
-      data.childrenByParentId.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.id),
+      );
     },
   }),
 );
@@ -526,7 +534,7 @@ test(
 
       const data = result.data.createParent.parent;
       expect(data.jane.nodes).toHaveLength(2);
-      data.jane.nodes.map(n => expect(n.parentId).toBe(data.id));
+      data.jane.nodes.map((n) => expect(n.parentId).toBe(data.id));
     },
   }),
 );
@@ -584,7 +592,9 @@ test(
 
       const result = await graphql(schema, query, null, { pgClient });
       expect(result).toHaveProperty('errors');
-      expect(result.errors[0].message).toMatch(/"childrenUsingId" is not defined/);
+      expect(result.errors[0].message).toMatch(
+        /"childrenUsingId" is not defined/,
+      );
     },
   }),
 );
