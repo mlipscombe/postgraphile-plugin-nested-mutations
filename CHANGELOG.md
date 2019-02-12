@@ -1,5 +1,10 @@
 # Changes
 
+## v1.0.0-alpha.22
+
+  * Fix bug where if an update mutation was called that did not locate
+    a row, we'd still try and extract the PKs.
+    
 ## v1.0.0-alpha.21
 
   * Really fix `updateByNodeId`.  Thanks for the report @ken0x0a!
