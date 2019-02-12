@@ -736,3 +736,49 @@ test(
     },
   }),
 );
+
+test(
+  'update with no row matched works',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      insert into p.parent values(1, 'test parent');
+      insert into p.child values(1, 1, 'test child');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          updateParentById(
+            input: {
+              id: 2
+              parentPatch: {
+                name: "other name"
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+    },
+  }),
+);

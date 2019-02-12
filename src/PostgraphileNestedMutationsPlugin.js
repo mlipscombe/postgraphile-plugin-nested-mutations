@@ -565,7 +565,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
         const primaryKeyConstraint = table.constraints.find(
           (con) => con.type === 'p',
         );
-        if (primaryKeyConstraint) {
+        if (primaryKeyConstraint && row) {
           const primaryKeyFields = primaryKeyConstraint.keyAttributes;
 
           const where = [];
