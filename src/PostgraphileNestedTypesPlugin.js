@@ -137,6 +137,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
       pgNestedPluginForwardInputTypes,
       pgNestedPluginReverseInputTypes,
       pgNestedTableConnectorFields,
+      pgNestedTableDeleterFields,
       pgNestedTableUpdaterFields,
       pgNestedFieldName,
       graphql: {
@@ -206,7 +207,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
         !omit(constraint, 'delete');
 
       if (
-        (!connectable && !creatable && !updateable) ||
+        (!connectable && !creatable && !deleteable && !updateable) ||
         omit(foreignTable, 'read')
         // || primaryKey.keyAttributes.some(key => omit(key, 'read'))
         // || foreignPrimaryKey.keyAttributes.some(key => omit(key, 'read'))
@@ -273,6 +274,20 @@ module.exports = function PostGraphileNestedTypesPlugin(
                 };
               },
             );
+            if (deleteable) {
+              pgNestedTableDeleterFields[foreignTable.id].forEach(
+                ({ field, fieldName: deleterFieldName }) => {
+                  operations[deleterFieldName] = {
+                    description: `The primary key(s) for \`${foreignTableName}\` for the far side of the relationship.`,
+                    type: isForward
+                      ? field
+                      : isUnique
+                      ? field
+                      : new GraphQLList(new GraphQLNonNull(field)),
+                  };
+                },
+              );
+            }
             pgNestedTableUpdaterFields[table.id][constraint.id].forEach(
               ({ field, fieldName: updaterFieldName }) => {
                 operations[updaterFieldName] = {
