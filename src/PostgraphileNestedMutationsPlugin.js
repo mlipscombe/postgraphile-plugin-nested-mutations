@@ -520,40 +520,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                   );
                 }),
             );
-
-            if (fieldValue.create) {
-              await Promise.all(
-                fieldValue.create.map(async (rowData) => {
-                  const resolver = pgNestedResolvers[foreignTable.id];
-                  const tableVar = inflection.tableFieldName(foreignTable);
-
-                  const keyData = {};
-                  keys.forEach((k, idx) => {
-                    const columnName = inflection.column(k);
-                    keyData[columnName] = row[foreignKeys[idx].name];
-                  });
-
-                  const { data: reverseRow } = await resolver(
-                    data,
-                    {
-                      input: {
-                        [tableVar]: Object.assign({}, rowData, keyData),
-                      },
-                    },
-                    { pgClient },
-                    resolveInfo,
-                  );
-
-                  const rowKeyValues = {};
-                  if (primaryKeys) {
-                    primaryKeys.forEach((k) => {
-                      rowKeyValues[k.name] = reverseRow[`__pk__${k.name}`];
-                    });
-                  }
-                  modifiedRows.push(rowKeyValues);
-                }),
-              );
-            }
+            
             if (fieldValue.deleteOthers) {
               // istanbul ignore next
               if (!primaryKeys) {
@@ -603,6 +570,40 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                 values: deleteQueryValues,
               } = sql.compile(deleteQuery);
               await pgClient.query(deleteQueryText, deleteQueryValues);
+            }
+
+            if (fieldValue.create) {
+              await Promise.all(
+                fieldValue.create.map(async (rowData) => {
+                  const resolver = pgNestedResolvers[foreignTable.id];
+                  const tableVar = inflection.tableFieldName(foreignTable);
+
+                  const keyData = {};
+                  keys.forEach((k, idx) => {
+                    const columnName = inflection.column(k);
+                    keyData[columnName] = row[foreignKeys[idx].name];
+                  });
+
+                  const { data: reverseRow } = await resolver(
+                    data,
+                    {
+                      input: {
+                        [tableVar]: Object.assign({}, rowData, keyData),
+                      },
+                    },
+                    { pgClient },
+                    resolveInfo,
+                  );
+
+                  const rowKeyValues = {};
+                  if (primaryKeys) {
+                    primaryKeys.forEach((k) => {
+                      rowKeyValues[k.name] = reverseRow[`__pk__${k.name}`];
+                    });
+                  }
+                  modifiedRows.push(rowKeyValues);
+                }),
+              );
             }
           }),
         );
