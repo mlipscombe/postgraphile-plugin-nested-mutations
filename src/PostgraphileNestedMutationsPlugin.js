@@ -69,6 +69,8 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
       pgNestedResolvers,
       pgNestedTableConnectorFields,
       pgNestedTableConnect,
+      pgNestedTableDeleterFields,
+      pgNestedTableDelete,
       pgNestedTableUpdaterFields,
       pgNestedTableUpdate,
       pgViaTemporaryTable: viaTemporaryTable,
@@ -147,6 +149,27 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                     nestedField,
                     connectorField,
                     input: fieldValue[connectorField.fieldName],
+                    pgClient,
+                  });
+
+                  if (!row) {
+                    throw new Error('invalid connect keys');
+                  }
+
+                  foreignKeys.forEach((k, idx) => {
+                    output[inflection.column(keys[idx])] = row[k.name];
+                  });
+                }),
+            );
+
+            await Promise.all(
+              pgNestedTableDeleterFields[foreignTable.id]
+                .filter((f) => fieldValue[f.fieldName])
+                .map(async (deleterField) => {
+                  const row = await pgNestedTableDelete({
+                    nestedField,
+                    deleterField,
+                    input: fieldValue[deleterField.fieldName],
                     pgClient,
                   });
 
@@ -421,6 +444,30 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                         });
                         modifiedRows.push(rowKeyValues);
                       }
+                    }),
+                  );
+                }),
+            );
+
+            await Promise.all(
+              pgNestedTableDeleterFields[foreignTable.id]
+                .filter((f) => fieldValue[f.fieldName])
+                .map(async (deleterField) => {
+                  const connections = Array.isArray(
+                    fieldValue[deleterField.fieldName],
+                  )
+                    ? fieldValue[deleterField.fieldName]
+                    : [fieldValue[deleterField.fieldName]];
+
+                  await Promise.all(
+                    connections.map(async (k) => {
+                      await pgNestedTableDelete({
+                        nestedField,
+                        deleterField,
+                        input: k,
+                        pgClient,
+                        parentRow: row,
+                      });
                     }),
                   );
                 }),
