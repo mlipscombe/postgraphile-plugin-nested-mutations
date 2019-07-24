@@ -288,18 +288,20 @@ module.exports = function PostGraphileNestedTypesPlugin(
                 },
               );
             }
-            pgNestedTableUpdaterFields[table.id][constraint.id].forEach(
-              ({ field, fieldName: updaterFieldName }) => {
-                operations[updaterFieldName] = {
-                  description: `The primary key(s) and patch data for \`${foreignTableName}\` for the far side of the relationship.`,
-                  type: isForward
-                    ? field
-                    : isUnique
-                    ? field
-                    : new GraphQLList(new GraphQLNonNull(field)),
-                };
-              },
-            );
+            if (pgNestedTableUpdaterFields[table.id][constraint.id]) {
+              pgNestedTableUpdaterFields[table.id][constraint.id].forEach(
+                ({ field, fieldName: updaterFieldName }) => {
+                  operations[updaterFieldName] = {
+                    description: `The primary key(s) and patch data for \`${foreignTableName}\` for the far side of the relationship.`,
+                    type: isForward
+                      ? field
+                      : isUnique
+                      ? field
+                      : new GraphQLList(new GraphQLNonNull(field)),
+                  };
+                },
+              );
+            }
             if (creatable) {
               const createInputType = newWithHooks(
                 GraphQLInputObjectType,
