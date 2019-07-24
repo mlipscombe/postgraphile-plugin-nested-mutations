@@ -5,11 +5,6 @@
 This plugin implements nested mutations based on both forward and reverse foreign
 key relationships in PostGraphile v4.  Nested mutations can be of infinite depth.
 
-## Warning
-This is *alpha quality* software.  It has not undergone significant testing and 
-it might eat all your data.  Until it reaches beta stage, there are no guarantees
-of backwards compatibility.  Consult the CHANGELOG for upgrade information.
-
 ## Getting Started
 
 ### CLI
