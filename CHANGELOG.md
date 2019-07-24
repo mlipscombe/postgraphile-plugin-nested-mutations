@@ -1,5 +1,10 @@
 # Changes
 
+## v1.0.0
+
+  * Bump dependencies.
+  * Guard against creating updater fields where constraint is not available.
+
 ## v1.0.0-alpha.22
 
   * Fix bug where if an update mutation was called that did not locate
