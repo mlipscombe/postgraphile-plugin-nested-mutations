@@ -92,7 +92,7 @@ module.exports = function PostGraphileNestedUpdatersPlugin(builder) {
           if (identifiers.length !== primaryKeys.length) {
             throw new Error('Invalid ID');
           }
-          keyWhere = sql.fragment`${sql.join(
+          keyWhere = sql.fragment`(${sql.join(
             primaryKeys.map(
               (key, idx) =>
                 sql.fragment`${sql.identifier(key.name)} = ${gql2pg(
@@ -102,10 +102,10 @@ module.exports = function PostGraphileNestedUpdatersPlugin(builder) {
                 )}`,
             ),
             ') and (',
-          )}`;
+          )})`;
         } else {
           const foreignPrimaryKeys = constraint.keyAttributes;
-          keyWhere = sql.fragment`${sql.join(
+          keyWhere = sql.fragment`(${sql.join(
             foreignPrimaryKeys.map(
               (k) => sql.fragment`
                 ${sql.identifier(k.name)} = ${gql2pg(
@@ -116,7 +116,7 @@ module.exports = function PostGraphileNestedUpdatersPlugin(builder) {
               `,
             ),
             ') and (',
-          )}`;
+          )})`;
         }
 
         const patchField =

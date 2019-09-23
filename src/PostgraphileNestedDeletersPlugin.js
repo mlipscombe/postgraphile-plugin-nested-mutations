@@ -77,7 +77,7 @@ module.exports = function PostGraphileNestedDeletersPlugin(builder) {
           if (identifiers.length !== primaryKeys.length) {
             throw new Error('Invalid ID');
           }
-          where = sql.fragment`${sql.join(
+          where = sql.fragment`(${sql.join(
             primaryKeys.map(
               (key, idx) =>
                 sql.fragment`${sql.identifier(key.name)} = ${gql2pg(
@@ -87,10 +87,10 @@ module.exports = function PostGraphileNestedDeletersPlugin(builder) {
                 )}`,
             ),
             ') and (',
-          )}`;
+          )})`;
         } else {
           const foreignPrimaryKeys = constraint.keyAttributes;
-          where = sql.fragment`${sql.join(
+          where = sql.fragment`(${sql.join(
             foreignPrimaryKeys.map(
               (k) => sql.fragment`
                 ${sql.identifier(k.name)} = ${gql2pg(
@@ -101,7 +101,7 @@ module.exports = function PostGraphileNestedDeletersPlugin(builder) {
               `,
             ),
             ') and (',
-          )}`;
+          )})`;
         }
         const select = foreignKeys.map((k) => sql.identifier(k.name));
         const query = parentRow
