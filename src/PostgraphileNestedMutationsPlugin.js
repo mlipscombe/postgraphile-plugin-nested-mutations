@@ -389,9 +389,14 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
 
         await Promise.all(
           Object.keys(inputData).map(async (key) => {
-            const nestedField = pgNestedPluginReverseInputTypes[table.id].find(
+            let nestedField = pgNestedPluginReverseInputTypes[table.id].find(
               (obj) => obj.name === key,
             );
+            if (!nestedField) {
+              nestedField = pgNestedPluginForwardInputTypes[table.id].find(
+                (obj) => obj.name === key,
+              );
+            }
             if (!nestedField || !inputData[key]) {
               return;
             }
