@@ -438,6 +438,11 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                       });
 
                       if (primaryKeys) {
+                        if (!connectedRow) {
+                          throw new Error(
+                            'Unable to update/select parent row.',
+                          );
+                        }
                         const rowKeyValues = {};
                         primaryKeys.forEach((col) => {
                           rowKeyValues[col.name] = connectedRow[col.name];
@@ -520,7 +525,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                   );
                 }),
             );
-            
+
             if (fieldValue.deleteOthers) {
               // istanbul ignore next
               if (!primaryKeys) {
