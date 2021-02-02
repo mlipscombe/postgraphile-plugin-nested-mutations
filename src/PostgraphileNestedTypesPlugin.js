@@ -302,7 +302,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
                 },
               );
             }
-            if (creatable) {
+            if (creatable && gqlForeignTableType) {
               const createInputType = newWithHooks(
                 GraphQLInputObjectType,
                 {
