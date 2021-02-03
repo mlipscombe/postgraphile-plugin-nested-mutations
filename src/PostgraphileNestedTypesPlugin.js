@@ -14,10 +14,20 @@ module.exports = function PostGraphileNestedTypesPlugin(
             name,
             tags: { name: tagName },
           },
+          table,
+          foreignTable,
           isForward,
         } = options;
         return inflection.upperCamelCase(
-          `${tagName || name}_${isForward ? '' : 'Inverse'}_input`,
+          `${
+            inflection.tableFieldName(table)
+          }_${
+            tagName || name
+          }_${
+            inflection.tableFieldName(foreignTable)
+          }_${
+            isForward ? '' : 'Inverse'
+          }_nested_input`
         );
       },
       nestedCreateInputType(options) {
@@ -26,10 +36,17 @@ module.exports = function PostGraphileNestedTypesPlugin(
             name,
             tags: { name: tagName },
           },
+          table,
           foreignTable,
         } = options;
         return inflection.upperCamelCase(
-          `${tagName || name}_${foreignTable.name}_create_input`,
+          `${
+            inflection.tableFieldName(table)
+          }_${
+            tagName || name
+          }_${
+            inflection.tableFieldName(foreignTable)
+          }_create_input`
         );
       },
     }),
@@ -212,7 +229,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
         // || primaryKey.keyAttributes.some(key => omit(key, 'read'))
         // || foreignPrimaryKey.keyAttributes.some(key => omit(key, 'read'))
       ) {
-        return;
+        return fields;
       }
 
       const keys = constraint.keyAttributes;
@@ -302,7 +319,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
                 },
               );
             }
-            if (creatable) {
+            if (creatable && gqlForeignTableType) {
               const createInputType = newWithHooks(
                 GraphQLInputObjectType,
                 {
