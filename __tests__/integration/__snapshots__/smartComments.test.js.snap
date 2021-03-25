@@ -2,23 +2,26 @@
 
 exports[`@omit create on child table inhibits nested create 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -84,29 +87,34 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`@omit create on column in foreign key inhibits nested mutation 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -174,29 +182,34 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`@omit create on column referenced column parent table does not inhibit nested mutation 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -266,29 +279,34 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`@omit on foreign key inhibits nested mutation 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -340,29 +358,34 @@ GraphQLSchema {
     "__TypeKind": "__TypeKind",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`setting @fieldName changes field name 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -432,29 +455,34 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`setting @foreignFieldName changes field name 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -524,29 +552,34 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`setting @forwardMutationName changes field name 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -616,29 +649,34 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`setting @name on relation does not affect field names, but changes type names 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -708,29 +746,34 @@ GraphQLSchema {
     "updateParentOnChildForParentChildRelationPatch": "updateParentOnChildForParentChildRelationPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`setting @reverseMutationName changes field name 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -800,28 +843,33 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`unreadable foreign table inhibits nested mutation 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -858,6 +906,8 @@ GraphQLSchema {
     "__TypeKind": "__TypeKind",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;

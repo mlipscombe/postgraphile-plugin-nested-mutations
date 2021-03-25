@@ -994,6 +994,7 @@ test(
       ],
       simpleCollections: 'both',
       legacyRelations: 'omit',
+      pgShortPk: true,
       graphileBuildOptions: {
         nestedMutationsDeleteOthers: false,
         nestedMutationsSimpleFieldNames: true,
@@ -1014,7 +1015,7 @@ test(
               username
             }
           }
-          o2: updateUser(
+          o2: updateUserByNodeId(
             input: {
               nodeId: "WyJ1c2VycyIsMV0="
               patch: {

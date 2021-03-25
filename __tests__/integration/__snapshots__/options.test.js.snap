@@ -2,23 +2,26 @@
 
 exports[`simple names, plural when one-to-many, singular in reverse 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -88,29 +91,34 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`simple names, singular when one-to-one 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -180,29 +188,34 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`still plural when one-to-one if nestedMutationsOldUniqueFields is enabled 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -272,6 +285,8 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;

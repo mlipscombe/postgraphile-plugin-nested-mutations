@@ -1,15 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`prints a schema with the nested mutations plugin 1`] = `
-"\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
-interface Node {
-  \\"\\"\\"
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  \\"\\"\\"
-  nodeId: ID!
-}
-
-\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+"\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
   node(
@@ -27,20 +19,20 @@ type Query implements Node {
   which can only query top level fields if they are in a particular form.
   \\"\\"\\"
   query: Query!
+}
+
+\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+interface Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
 }
 "
 `;
 
 exports[`prints a schema with the nested mutations plugin in simple names mode 1`] = `
-"\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
-interface Node {
-  \\"\\"\\"
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  \\"\\"\\"
-  nodeId: ID!
-}
-
-\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
+"\\"\\"\\"The root query type which gives access points into the data universe.\\"\\"\\"
 type Query implements Node {
   \\"\\"\\"Fetches an object given its globally unique \`ID\`.\\"\\"\\"
   node(
@@ -58,6 +50,14 @@ type Query implements Node {
   which can only query top level fields if they are in a particular form.
   \\"\\"\\"
   query: Query!
+}
+
+\\"\\"\\"An object with a globally unique \`ID\`.\\"\\"\\"
+interface Node {
+  \\"\\"\\"
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  \\"\\"\\"
+  nodeId: ID!
 }
 "
 `;

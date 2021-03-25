@@ -17,24 +17,24 @@
     "lint": "eslint index.js src/**/*.js"
   },
   "dependencies": {
-    "graphile-build-pg": "^4.2.0"
+    "graphile-build-pg": "^4.11.2"
   },
   "peerDependencies": {
     "postgraphile-core": "^4.2.0"
   },
   "devDependencies": {
-    "@graphile-contrib/pg-simplify-inflector": "^4.0.0-alpha.0",
-    "eslint": "^5.10.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-config-prettier": "^4.0.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-prettier": "^3.0.1",
-    "graphql": "^14.0.2",
-    "jest": "^24.8.0",
-    "jest-junit": "^5.2.0",
-    "pg": "^7.7.1",
-    "postgraphile-core": "^4.2.0",
-    "prettier": "^1.16.4"
+    "@graphile-contrib/pg-simplify-inflector": "^6.1.0",
+    "eslint": "^7.22.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-prettier": "^3.3.1",
+    "graphql": "^15.5.0",
+    "jest": "^26.6.3",
+    "jest-junit": "^12.0.0",
+    "pg": "^8.5.1",
+    "postgraphile-core": "^4.11.2",
+    "prettier": "^2.2.1"
   },
   "jest": {
     "testRegex": "__tests__/.*\\.test\\.js$",

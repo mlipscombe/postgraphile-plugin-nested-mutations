@@ -4,9 +4,6 @@ const { readFile } = require('fs');
 const pgConnectionString = require('pg-connection-string');
 const { createPostGraphileSchema } = require('postgraphile-core');
 
-// This test suite can be flaky. Increase it’s timeout.
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 1000 * 20;
-
 function readFilePromise(filename, encoding) {
   return new Promise((resolve, reject) => {
     readFile(filename, encoding, (err, res) => {
@@ -37,6 +34,7 @@ const withPgClient = async (url, fn) => {
       await client.release();
     } catch (e) {
       console.error('Error releasing pgClient', e);
+      throw e;
     }
     await pgPool.end();
   }
@@ -86,7 +84,7 @@ const withPrepopulatedDb = async (fn) => {
   }
 };
 
-withPrepopulatedDb.setup = (done) => {
+withPrepopulatedDb.setup = async () => {
   if (prepopulatedDBKeepalive) {
     throw new Error("There's already a prepopulated DB running");
   }
@@ -104,10 +102,9 @@ withPrepopulatedDb.setup = (done) => {
       prepopulatedDBKeepalive.vars = await populateDatabase(client);
     } catch (e) {
       console.error('FAILED TO PREPOPULATE DB!', e.message); // eslint-disable-line no-console
-      return done(e);
+      throw e;
     }
     await client.query('SAVEPOINT pristine;');
-    done();
     return prepopulatedDBKeepalive;
   });
 };

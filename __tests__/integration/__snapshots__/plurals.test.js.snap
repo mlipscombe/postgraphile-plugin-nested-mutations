@@ -2,23 +2,26 @@
 
 exports[`1:1 relationship does not allow multiple nested rows 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Post",
-      "PostImage",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Post",
+        "PostImage",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -93,29 +96,34 @@ GraphQLSchema {
     "updatePostOnPostImageForPostImagePostIdFkeyPatch": "updatePostOnPostImageForPostImagePostIdFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`1:1 relationship mutation fails when multiple operators are specified 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Post",
-      "PostImage",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Post",
+        "PostImage",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -190,29 +198,34 @@ GraphQLSchema {
     "updatePostOnPostImageForPostImagePostIdFkeyPatch": "updatePostOnPostImageForPostImagePostIdFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`plural when one-to-many, singular in reverse 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -282,29 +295,34 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
 
 exports[`singular when one-to-one 1`] = `
 GraphQLSchema {
-  "__allowedLegacyNames": Array [],
-  "__validationErrors": undefined,
+  "__validationErrors": Array [],
   "_directives": Array [
     "@include",
     "@skip",
     "@deprecated",
+    "@specifiedBy",
   ],
-  "_implementations": Object {
-    "Node": Array [
-      "Query",
-      "Child",
-      "Parent",
-    ],
+  "_implementationsMap": Object {
+    "Node": Object {
+      "interfaces": Array [],
+      "objects": Array [
+        "Query",
+        "Child",
+        "Parent",
+      ],
+    },
   },
   "_mutationType": "Mutation",
-  "_possibleTypeMap": undefined,
   "_queryType": "Query",
+  "_subTypeMap": Object {},
   "_subscriptionType": undefined,
   "_typeMap": Object {
     "Boolean": "Boolean",
@@ -374,6 +392,8 @@ GraphQLSchema {
     "updateParentOnChildForChildParentFkeyPatch": "updateParentOnChildForChildParentFkeyPatch",
   },
   "astNode": undefined,
+  "description": undefined,
   "extensionASTNodes": undefined,
+  "extensions": undefined,
 }
 `;
