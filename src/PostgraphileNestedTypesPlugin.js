@@ -329,9 +329,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
               );
 
               operations.create = {
-                description: `A \`${
-                  gqlForeignTableType.name
-                }\` object that will be created and connected to this object.`,
+                description: `A \`${gqlForeignTableType.name}\` object that will be created and connected to this object.`,
                 type: isForward
                   ? createInputType
                   : new GraphQLList(new GraphQLNonNull(createInputType)),

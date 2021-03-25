@@ -73,6 +73,7 @@
       "import/no-extraneous-dependencies": 0,
       "import/extensions": 0,
       "import/prefer-default-export": 0,
+      "prefer-object-spread": 0,
       "max-len": 0,
       "symbol-description": 0,
       "no-nested-ternary": 0,
