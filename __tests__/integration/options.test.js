@@ -248,3 +248,57 @@ test(
     },
   }),
 );
+
+// from https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/40
+test(
+  'id fields are renamed rowId when classicIds is enabled',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id uuid primary key default public.uuid_generate_v4(),
+        name text not null
+      );
+      create table p.child (
+        id uuid primary key default public.uuid_generate_v4(),
+        parent_id uuid references p.parent on delete set null,
+        name text not null
+      );
+    `,
+    options: {
+      classicIds: true,
+    },
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          createParent(
+            input: {
+              parent: {
+                name: "test"
+                childrenUsingRowId: {
+                  create: {
+                    name: "test child"
+                  }
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              rowId
+              childrenByParentId {
+                nodes {
+                  id
+                  rowId
+                }
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+    },
+  }),
+);

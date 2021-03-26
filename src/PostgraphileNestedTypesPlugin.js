@@ -59,8 +59,8 @@ module.exports = function PostGraphileNestedTypesPlugin(
           foreignTable,
         } = options;
         const tableFieldName = inflection.tableFieldName(foreignTable);
-        const keyNames = keys.map((k) => k.name);
-        const foreignKeyNames = foreignKeys.map((k) => k.name);
+        const keyNames = keys.map((k) => inflection.column(k));
+        const foreignKeyNames = foreignKeys.map((k) => inflection.column(k));
 
         const constraints = foreignTable.constraints
           .filter((con) => con.type === 'f')
@@ -176,7 +176,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
 
     foreignKeyConstraints.forEach((constraint) => {
       const isForward = constraint.classId === table.id;
-      
+
       const foreignTable = isForward
         ? introspectionResultsByKind.classById[constraint.foreignClassId]
         : introspectionResultsByKind.classById[constraint.classId];

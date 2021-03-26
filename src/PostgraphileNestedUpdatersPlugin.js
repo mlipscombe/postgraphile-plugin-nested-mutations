@@ -8,7 +8,7 @@ module.exports = function PostGraphileNestedUpdatersPlugin(builder) {
         const { constraint } = options;
         return this.camelCase(
           `update_by_${constraint.keyAttributes
-            .map((k) => k.name)
+            .map((k) => this.column(k))
             .join('_and_')}`,
         );
       },

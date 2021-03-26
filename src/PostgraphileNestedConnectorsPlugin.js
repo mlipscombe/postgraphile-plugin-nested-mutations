@@ -8,7 +8,7 @@ module.exports = function PostGraphileNestedConnectorsPlugin(builder) {
         const { constraint } = options;
         return this.camelCase(
           `connect_by_${constraint.keyAttributes
-            .map((k) => k.name)
+            .map((k) => this.column(k))
             .join('_and_')}`,
         );
       },
