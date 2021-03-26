@@ -885,3 +885,95 @@ test(
     },
   }),
 );
+
+// https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/33
+test(
+  'works with tables that relate to themselves - child > parent',
+  withSchema({
+    setup: `
+      create table p.person (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint person_parent_fkey foreign key (parent_id)
+          references p.person(id)
+      );
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          createPerson(
+            input: {
+              person: {
+                name: "test child"
+                personToParentId: {
+                  create: {
+                    name: "test parent"
+                    personToParentId: {
+                      create: {
+                        name: "test parent of parent"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            person {
+              id
+              name
+              parentId
+              personByParentId {
+                id
+                name
+                parentId
+                personByParentId {
+                  id
+                  name
+                  parentId
+                }
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const data = result.data.createPerson.person;
+      expect(data.personByParentId).toHaveProperty('id');
+    },
+  }),
+);
+
+// https://github.com/mlipscombe/postgraphile-plugin-nested-mutations/issues/31
+test(
+  'deleteBy works',
+  withSchema({
+    setup: `
+      CREATE TABLE p.a (a_id SERIAL PRIMARY KEY, name TEXT);
+      CREATE TABLE p.b (b_id SERIAL PRIMARY KEY, name TEXT);
+      CREATE TABLE p.a_b (a_id INT REFERENCES p.a(a_id), b_id INT REFERENCES p.b(b_id), PRIMARY KEY (a_id, b_id));
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation  {
+          createA(
+            input: { a: { aBsUsingAId: { deleteByAIdAndBId: { aId: 10, bId: 10 } } } }
+          ) {
+            clientMutationId
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      // const data = result.data.createPerson.person;
+      // expect(data.personByParentId).toHaveProperty('id');
+    },
+  }),
+);

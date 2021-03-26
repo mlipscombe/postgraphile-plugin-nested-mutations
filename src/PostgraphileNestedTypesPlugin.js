@@ -176,6 +176,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
 
     foreignKeyConstraints.forEach((constraint) => {
       const isForward = constraint.classId === table.id;
+      
       const foreignTable = isForward
         ? introspectionResultsByKind.classById[constraint.foreignClassId]
         : introspectionResultsByKind.classById[constraint.classId];
