@@ -977,3 +977,116 @@ test(
     },
   }),
 );
+
+test(
+  'reverse nested mutation with non-serial / default parent PK creates record',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id text primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id text,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          createChild(
+            input: {
+              child: {
+                name: "test f1"
+                parentId: "123"
+                parentToParentId: {
+                  create: {
+                    id: "123"
+                    name: "parent of f1"
+                  }
+                }
+              }
+            }
+          ) {
+            child {
+              id
+              name
+              parentId
+              parentByParentId {
+                id
+                name
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const data = result.data.createChild.child;
+      expect(data.parentByParentId.id).toEqual(data.parentId);
+    },
+  }),
+);
+
+test(
+  'reverse nested mutation with same column names creates record',
+  withSchema({
+    setup: `
+      create table p.parent (
+        parent_id text primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id text,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (parent_id)
+      );
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          createChild(
+            input: {
+              child: {
+                name: "test f1"
+                parentToParentId: {
+                  create: {
+                    parentId: "123"
+                    name: "parent of f1"
+                  }
+                }
+              }
+            }
+          ) {
+            child {
+              id
+              name
+              parentId
+              parentByParentId {
+                parentId
+                name
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const data = result.data.createChild.child;
+      expect(data.parentByParentId.parentId).toEqual(data.parentId);
+    },
+  }),
+);

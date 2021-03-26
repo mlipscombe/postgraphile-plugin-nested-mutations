@@ -311,11 +311,7 @@ module.exports = function PostGraphileNestedTypesPlugin(
                   description: `The \`${foreignTableName}\` to be created by this mutation.`,
                   fields: () => {
                     const inputFields = gqlForeignTableType._fields;
-                    const omittedFields = constraint.keyAttributes.map((k) =>
-                      inflection.column(k),
-                    );
                     return Object.keys(inputFields)
-                      .filter((key) => !omittedFields.includes(key))
                       .map((k) => Object.assign({}, { [k]: inputFields[k] }))
                       .reduce((res, o) => Object.assign(res, o), {});
                   },
