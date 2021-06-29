@@ -41,7 +41,8 @@ module.exports = function PostGraphileNestedTypesPlugin(
     return extend(build, {
       pgNestedPluginForwardInputTypes: {},
       pgNestedPluginReverseInputTypes: {},
-      pgNestedResolvers: {},
+      pgNestedCreateResolvers: {},
+      pgNestedUpdateResolvers: {},
       pgNestedFieldName(options) {
         const {
           constraint: {
