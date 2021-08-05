@@ -130,8 +130,11 @@ test(
       data.childrenByParentId.nodes.map((n) =>
         expect(n.parentId).toBe(data.id),
       );
-      expect(data.childrenByParentId.nodes.map(n => n.id))
-        .toEqual([95, 98, 99]);
+      expect(data.childrenByParentId.nodes.map((n) => n.id)).toEqual([
+        95,
+        98,
+        99,
+      ]);
     },
   }),
 );
@@ -279,8 +282,12 @@ test(
       data.childrenByParentId.nodes.map((n) =>
         expect(n.parentId).toBe(data.id),
       );
-      expect(data.childrenByParentId.nodes.map(n => n.id))
-        .toEqual([95, 97, 98, 99]);
+      expect(data.childrenByParentId.nodes.map((n) => n.id)).toEqual([
+        95,
+        97,
+        98,
+        99,
+      ]);
     },
   }),
 );
@@ -358,8 +365,9 @@ test(
 
       const result = await graphql(schema, query, null, { pgClient });
       expect(result).toHaveProperty('errors');
-      expect(result.errors[0].message)
-        .toMatch(/"deleteByNodeId" is not defined/);
+      expect(result.errors[0].message).toMatch(
+        /"deleteByNodeId" is not defined/,
+      );
     },
   }),
 );
@@ -1079,6 +1087,763 @@ test(
 
       const result = await graphql(schema, query, null, { pgClient });
       expect(result).not.toHaveProperty('errors');
+    },
+  }),
+);
+
+test(
+  'forward deeply nested update mutation with nested updateById and create',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      create table p.grandchild (
+        id serial primary key,
+        child_id integer not null,
+        name text not null,
+        constraint grandchild_child_fkey foreign key (child_id)
+          references p.child (id)
+      );
+
+      insert into p.parent values(1, 'test parent');
+      insert into p.child values(1, 1, 'test child 1');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          updateParentById(
+            input: {
+              id: 1
+              parentPatch: {
+                name: "updated parent"
+                childrenUsingId: {
+                  updateById: {
+                    id: 1
+                    childPatch: {
+                      name: "updated child 1"
+                      grandchildrenUsingId: {
+                        create: [{ name: "grandchild 1 of child 1" }]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                  grandchildrenByChildId {
+                    nodes {
+                      id
+                      childId
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const { data } = result;
+
+      expect(data.updateParentById.parent.name).toEqual('updated parent');
+      data.updateParentById.parent.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.updateParentById.parent.id),
+      );
+
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes,
+      ).toHaveLength(1);
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[0].name,
+      ).toEqual('updated child 1');
+
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[0]
+          .grandchildrenByChildId.nodes,
+      ).toHaveLength(1);
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[0]
+          .grandchildrenByChildId.nodes[0].name,
+      ).toEqual('grandchild 1 of child 1');
+    },
+  }),
+);
+
+test(
+  'forward deeply nested update mutation with nested updateById',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      create table p.grandchild (
+        id serial primary key,
+        child_id integer not null,
+        name text not null,
+        constraint grandchild_child_fkey foreign key (child_id)
+          references p.child (id)
+      );
+
+      insert into p.parent values(1, 'test parent');
+      insert into p.child values(1, 1, 'test child 1');
+      insert into p.grandchild values(1, 1, 'test grandchild 1');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          updateParentById(
+            input: {
+              id: 1
+              parentPatch: {
+                name: "updated parent"
+                childrenUsingId: {
+                  updateById: {
+                    id: 1
+                    childPatch: {
+                      name: "updated child 1"
+                      grandchildrenUsingId: {
+                        updateById: {
+                          id: 1
+                          grandchildPatch: {
+                            name: "updated grandchild 1 of child 1"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                  grandchildrenByChildId {
+                    nodes {
+                      id
+                      childId
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const { data } = result;
+
+      expect(data.updateParentById.parent.name).toEqual(`updated parent`);
+      data.updateParentById.parent.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.updateParentById.parent.id),
+      );
+
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes,
+      ).toHaveLength(1);
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[0].name,
+      ).toEqual('updated child 1');
+
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[0]
+          .grandchildrenByChildId.nodes,
+      ).toHaveLength(1);
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[0]
+          .grandchildrenByChildId.nodes[0].name,
+      ).toEqual('updated grandchild 1 of child 1');
+    },
+  }),
+);
+
+test(
+  'forward deeply nested update mutation with nested updateById and connectById',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      create table p.grandchild (
+        id serial primary key,
+        child_id integer not null,
+        name text not null,
+        constraint grandchild_child_fkey foreign key (child_id)
+          references p.child (id)
+      );
+
+      insert into p.parent values(1, 'test parent');
+      insert into p.child values(1, 1, 'test child 1');
+      insert into p.child values(2, 1, 'test child 2');
+      insert into p.grandchild values(1, 1, 'test grandchild 1');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          updateParentById(
+            input: {
+              id: 1
+              parentPatch: {
+                name: "updated parent"
+                childrenUsingId: {
+                  updateById: {
+                    id: 1
+                    childPatch: {
+                      name: "updated child 1"
+                      grandchildrenUsingId: {
+                        updateById: {
+                          id: 1
+                          grandchildPatch: {
+                            childToChildId: {
+                              connectById: { id: 2 }
+                            }
+                            name: "changed parent of grandchild 1"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                  grandchildrenByChildId {
+                    nodes {
+                      id
+                      childId
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const { data } = result;
+
+      expect(data.updateParentById.parent.name).toEqual(`updated parent`);
+      data.updateParentById.parent.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.updateParentById.parent.id),
+      );
+
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes,
+      ).toHaveLength(2);
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[0].name,
+      ).toEqual('updated child 1');
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[1].name,
+      ).toEqual('test child 2');
+
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[1]
+          .grandchildrenByChildId.nodes,
+      ).toHaveLength(1);
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[1]
+          .grandchildrenByChildId.nodes[0].childId,
+      ).toEqual(2);
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[1]
+          .grandchildrenByChildId.nodes[0].name,
+      ).toEqual('changed parent of grandchild 1');
+    },
+  }),
+);
+
+test(
+  'forward deeply nested update mutation with nested updateById and deleteById',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      create table p.grandchild (
+        id serial primary key,
+        child_id integer not null,
+        name text not null,
+        constraint grandchild_child_fkey foreign key (child_id)
+          references p.child (id)
+      );
+
+      insert into p.parent values(1, 'test parent');
+      insert into p.child values(1, 1, 'test child 1');
+      insert into p.child values(2, 1, 'test child 2');
+      insert into p.grandchild values(1, 1, 'test grandchild 1');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          updateParentById(
+            input: {
+              id: 1
+              parentPatch: {
+                name: "updated parent"
+                childrenUsingId: {
+                  updateById: {
+                    id: 1
+                    childPatch: {
+                      name: "updated child 1"
+                      grandchildrenUsingId: {
+                        deleteById: {
+                          id: 1
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                  grandchildrenByChildId {
+                    nodes {
+                      id
+                      childId
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const { data } = result;
+
+      expect(data.updateParentById.parent.name).toEqual(`updated parent`);
+      data.updateParentById.parent.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(data.updateParentById.parent.id),
+      );
+
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes,
+      ).toHaveLength(2);
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[0].name,
+      ).toEqual('updated child 1');
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[1].name,
+      ).toEqual('test child 2');
+
+      expect(
+        data.updateParentById.parent.childrenByParentId.nodes[1]
+          .grandchildrenByChildId.nodes,
+      ).toHaveLength(0);
+    },
+  }),
+);
+
+test(
+  'forward deeply nested mutation with nested updateByNodeId',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+      
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      create table p.grandchild (
+        id serial primary key,
+        child_id integer not null,
+        name text not null,
+        constraint grandchild_child_fkey foreign key (child_id)
+          references p.child (id)
+      );
+
+      insert into p.parent values(1, 'test parent');
+      insert into p.child values(1, 1, 'test child');
+      insert into p.grandchild values(1, 1, 'test grandchild');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const lookupChildQuery = `
+        query {
+          childById(id: 1) {
+            nodeId
+          }
+        }
+      `;
+      const lookupChildResult = await graphql(schema, lookupChildQuery, null, {
+        pgClient,
+      });
+      const { nodeId: childNodeId } = lookupChildResult.data.childById;
+      expect(childNodeId).not.toBeUndefined();
+
+      const lookupGrandchildQuery = `
+        query {
+          grandchildById(id: 1) {
+            nodeId
+          }
+        }
+      `;
+      const lookupGrandchildResult = await graphql(
+        schema,
+        lookupGrandchildQuery,
+        null,
+        {
+          pgClient,
+        },
+      );
+      const {
+        nodeId: grandchildNodeId,
+      } = lookupGrandchildResult.data.grandchildById;
+      expect(grandchildNodeId).not.toBeUndefined();
+
+      const query = `
+        mutation {
+          updateParentById(
+            input: {
+              id: 1
+              parentPatch: {
+                childrenUsingId: {
+                  updateByNodeId: {
+                    nodeId: "${childNodeId}"
+                    childPatch: {
+                      name: "renamed child"
+                      grandchildrenUsingId: {
+                        updateByNodeId: {
+                          nodeId: "${grandchildNodeId}"
+                          grandchildPatch: {
+                            name: "renamed grandchild"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                  grandchildrenByChildId {
+                    nodes {
+                      id
+                      childId
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const childData = result.data.updateParentById.parent;
+      expect(childData.childrenByParentId.nodes).toHaveLength(1);
+      childData.childrenByParentId.nodes.map((n) =>
+        expect(n.parentId).toBe(childData.id),
+      );
+      expect(childData.childrenByParentId.nodes[0].name).toEqual(
+        'renamed child',
+      );
+
+      const grandchildData = childData.childrenByParentId.nodes[0];
+      expect(grandchildData.grandchildrenByChildId.nodes).toHaveLength(1);
+      grandchildData.grandchildrenByChildId.nodes.map((n) =>
+        expect(n.childId).toBe(grandchildData.id),
+      );
+      expect(grandchildData.grandchildrenByChildId.nodes[0].name).toEqual(
+        'renamed grandchild',
+      );
+    },
+  }),
+);
+
+test(
+  'reverse deeply nested mutation with nested updateById',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+      
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      create table p.grandchild (
+        id serial primary key,
+        child_id integer not null,
+        name text not null,
+        constraint grandchild_child_fkey foreign key (child_id)
+          references p.child (id)
+      );
+      
+      insert into p.parent values(1, 'test parent');
+      insert into p.child values(1, 1, 'test child');
+      insert into p.grandchild values(1, 1, 'test grandchild');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+      mutation {
+        updateGrandchildById(
+          input: {
+            id: 1
+            grandchildPatch: {
+              childToChildId: {
+                updateById: {
+                  id: 1
+                  childPatch: {
+                    parentToParentId: {
+                      updateById: { id: 1, parentPatch: { name: "renamed parent" } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ) {
+          grandchild {
+            id
+            name
+            childByChildId {
+              id
+              name
+              parentByParentId {
+                id
+                name
+              }
+            }
+          }
+        }
+      }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const child = result.data.updateGrandchildById.grandchild.childByChildId;
+      expect(child.parentByParentId).not.toBeNull();
+      expect(child.parentByParentId.name).toEqual('renamed parent');
+    },
+  }),
+);
+
+test(
+  'reverse deeply nested mutation with nested updateByNodeId',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      create table p.grandchild (
+        id serial primary key,
+        child_id integer not null,
+        name text not null,
+        constraint grandchild_child_fkey foreign key (child_id)
+          references p.child (id)
+      );
+
+      insert into p.parent values(1, 'test parent');
+      insert into p.child values(1, 1, 'test child');
+      insert into p.grandchild values(1, 1, 'test grandchild');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const lookupParentQuery = `
+      query {
+        parentById(id: 1) {
+          nodeId
+        }
+      }
+    `;
+      const lookupParentResult = await graphql(
+        schema,
+        lookupParentQuery,
+        null,
+        {
+          pgClient,
+        },
+      );
+      const { nodeId: parentNodeId } = lookupParentResult.data.parentById;
+      expect(parentNodeId).not.toBeUndefined();
+
+      const lookupChildQuery = `
+        query {
+          childById(id: 1) {
+            nodeId
+          }
+        }
+      `;
+      const lookupChildResult = await graphql(schema, lookupChildQuery, null, {
+        pgClient,
+      });
+      const { nodeId: childNodeId } = lookupChildResult.data.childById;
+      expect(childNodeId).not.toBeUndefined();
+
+      const query = `
+        mutation {
+          updateGrandchildById(
+            input: {
+              id: 1
+              grandchildPatch: {
+                childToChildId: {
+                  updateByNodeId: {
+                    nodeId: "${childNodeId}"
+                    childPatch: {
+                      parentToParentId: {
+                        updateByNodeId: {
+                          nodeId: "${parentNodeId}"
+                          parentPatch: {
+                            name: "renamed parent"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ) {
+            grandchild {
+              id
+              name
+              childByChildId {
+                id
+                name
+                parentByParentId {
+                  id
+                  name
+                }
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const child = result.data.updateGrandchildById.grandchild.childByChildId;
+      expect(child.parentByParentId).not.toBeNull();
+      expect(child.parentByParentId.name).toEqual('renamed parent');
     },
   }),
 );
