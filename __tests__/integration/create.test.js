@@ -124,8 +124,75 @@ test(
                 name: "test f1"
                 childrenUsingId: {
                   create: null
+                  connectByNodeId: null
                   connectById: null
+                  deleteByNodeId: null
+                  deleteById: null
+                  updateByNodeId: null
                   updateById: null
+                }
+              }
+            }
+          ) {
+            parent {
+              id
+              name
+              childrenByParentId {
+                nodes {
+                  id
+                  parentId
+                  name
+                }
+              }
+            }
+          }
+        }
+      `;
+      expect(schema).toMatchSnapshot();
+
+      const result = await graphql(schema, query, null, { pgClient });
+      expect(result).not.toHaveProperty('errors');
+
+      const data = result.data.createParent.parent;
+      expect(data.childrenByParentId.nodes).toHaveLength(0);
+    },
+  }),
+);
+
+test(
+  'forward nested mutation with empty nested fields succeeds',
+  withSchema({
+    setup: `
+      create table p.parent (
+        id serial primary key,
+        name text not null
+      );
+
+      create table p.child (
+        id serial primary key,
+        parent_id integer,
+        name text not null,
+        constraint child_parent_fkey foreign key (parent_id)
+          references p.parent (id)
+      );
+
+      insert into p.child values(1, null, 'test child 1');
+    `,
+    test: async ({ schema, pgClient }) => {
+      const query = `
+        mutation {
+          createParent(
+            input: {
+              parent: {
+                name: "test f1"
+                childrenUsingId: {
+                  create: []
+                  connectByNodeId: []
+                  connectById: []
+                  deleteByNodeId: []
+                  deleteById: []
+                  updateByNodeId: []
+                  updateById: []
                 }
               }
             }
