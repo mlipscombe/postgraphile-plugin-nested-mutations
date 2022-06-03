@@ -457,6 +457,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
               );
             }
 
+            // perform nested connects
             await Promise.all(
               pgNestedTableConnectorFields[foreignTable.id]
                 .filter((f) => fieldValue[f.fieldName])
@@ -494,6 +495,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                 }),
             );
 
+            // perform nested deletes
             await Promise.all(
               pgNestedTableDeleterFields[foreignTable.id]
                 .filter((f) => fieldValue[f.fieldName])
@@ -518,6 +520,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                 }),
             );
 
+            // perform nested updates
             await Promise.all(
               pgNestedTableUpdaterFields[table.id][constraint.id]
                 .filter((f) => fieldValue[f.fieldName])
@@ -653,7 +656,7 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
 
             if (fieldValue.updateById || fieldValue.updateByNodeId) {
               await Promise.all(
-                Object.keys(fieldValue)
+                ['updateById', 'updateByNodeId']
                   .filter((f) => fieldValue[f])
                   .map(async (f) => {
                     await Promise.all(
