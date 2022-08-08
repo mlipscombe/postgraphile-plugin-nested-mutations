@@ -997,7 +997,9 @@ test(
     `,
     options: {
       appendPlugins: [
+        // eslint-disable-next-line global-require
         require('../../index.js'),
+        // eslint-disable-next-line global-require
         require('@graphile-contrib/pg-simplify-inflector'),
       ],
       simpleCollections: 'both',
