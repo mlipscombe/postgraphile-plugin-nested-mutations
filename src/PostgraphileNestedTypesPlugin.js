@@ -264,18 +264,20 @@ module.exports = function PostGraphileNestedTypesPlugin(
                 type: GraphQLBoolean,
               };
             }
-            pgNestedTableConnectorFields[foreignTable.id].forEach(
-              ({ field, fieldName: connectorFieldName }) => {
-                operations[connectorFieldName] = {
-                  description: `The primary key(s) for \`${foreignTableName}\` for the far side of the relationship.`,
-                  type: isForward
-                    ? field
-                    : isUnique
-                    ? field
-                    : new GraphQLList(new GraphQLNonNull(field)),
-                };
-              },
-            );
+            if (pgNestedTableConnectorFields[foreignTable.id]) {
+              pgNestedTableConnectorFields[foreignTable.id].forEach(
+                ({ field, fieldName: connectorFieldName }) => {
+                  operations[connectorFieldName] = {
+                    description: `The primary key(s) for \`${foreignTableName}\` for the far side of the relationship.`,
+                    type: isForward
+                      ? field
+                      : isUnique
+                      ? field
+                      : new GraphQLList(new GraphQLNonNull(field)),
+                  };
+                },
+              );
+            }
             if (deleteable) {
               pgNestedTableDeleterFields[foreignTable.id].forEach(
                 ({ field, fieldName: deleterFieldName }) => {
