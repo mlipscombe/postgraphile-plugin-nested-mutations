@@ -49,13 +49,14 @@ module.exports = function PostGraphileNestedConnectorsPlugin(builder) {
 
     return extend(build, {
       pgNestedTableConnectorFields: {},
-      pgNestedTableConnect: async ({
-        nestedField,
-        connectorField,
-        input,
-        pgClient,
-        parentRow,
-      }) => {
+      pgNestedTableConnect: async (options) => {
+        const {
+          nestedField,
+          connectorField,
+          input,
+          pgClient,
+          parentRow
+        } = options;
         const { foreignTable, keys, foreignKeys } = nestedField;
         const { isNodeIdConnector, constraint } = connectorField;
 
@@ -104,12 +105,13 @@ module.exports = function PostGraphileNestedConnectorsPlugin(builder) {
           )})`;
         }
         const select = foreignKeys.map((k) => sql.identifier(k.name));
+        const foreignTableIdentifier = sql.identifier(
+          foreignTable.namespace.name,
+          foreignTable.name,
+        )
         const query = parentRow
           ? sql.query`
-            update ${sql.identifier(
-              foreignTable.namespace.name,
-              foreignTable.name,
-            )}
+            update ${foreignTableIdentifier}
             set ${sql.join(
               keys.map(
                 (k, i) =>
@@ -123,14 +125,16 @@ module.exports = function PostGraphileNestedConnectorsPlugin(builder) {
             returning *`
           : sql.query`
               select ${sql.join(select, ', ')}
-              from ${sql.identifier(
-                foreignTable.namespace.name,
-                foreignTable.name,
-              )}
+              from ${foreignTableIdentifier}
               where ${where}`;
 
         const { text, values } = sql.compile(query);
         const { rows } = await pgClient.query(text, values);
+        const errorMessage  = 'parentRow' in options
+          ? `Unable to ${parentRow ? 'update' : 'select'} parent row from `+
+            `${foreignTable.namespace.name}.${foreignTable.name}.`
+          : 'invalid connect keys';
+        if (!rows.length) throw new Error(errorMessage);
         return rows[0];
       },
     });

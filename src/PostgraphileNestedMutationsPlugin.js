@@ -187,9 +187,6 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                     pgClient,
                   });
 
-                  if (!row) {
-                    throw new Error('invalid connect keys');
-                  }
 
                   foreignKeys.forEach((k, idx) => {
                     output[inflection.column(keys[idx])] = row[k.name];
@@ -479,11 +476,6 @@ module.exports = function PostGraphileNestedMutationPlugin(builder) {
                       });
 
                       if (primaryKeys) {
-                        if (!connectedRow) {
-                          throw new Error(
-                            'Unable to update/select parent row.',
-                          );
-                        }
                         const rowKeyValues = {};
                         primaryKeys.forEach((col) => {
                           rowKeyValues[col.name] = connectedRow[col.name];
